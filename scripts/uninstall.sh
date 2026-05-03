@@ -79,6 +79,12 @@ stop_service() {
     log_warn "$SERVICE_NAME service is not running — skipping stop"
   fi
 
+  # Also kill any lingering processes not managed by systemd
+  if pgrep -x "$SERVICE_NAME" >/dev/null; then
+    log_info "Killing lingering $SERVICE_NAME processes..."
+    pkill -9 "$SERVICE_NAME" || true
+  fi
+
   if systemctl is-enabled --quiet "$SERVICE_NAME" 2>/dev/null; then
     log_info "Disabling $SERVICE_NAME service..."
     systemctl disable "$SERVICE_NAME"
