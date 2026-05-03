@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ─────────────────────────────────────────────
-# terrorserver install.sh
-# Installs terrorserver from the stable GitHub release as a systemd service
-# ─────────────────────────────────────────────
-
 BINARY_NAME="terror"
 INSTALL_PATH="/usr/local/bin/terror"
 CONFIG_DIR="/etc/terror"
@@ -190,29 +185,36 @@ EOF
 }
 
 print_success() {
-  echo ""
-  echo -e "${GREEN}────────────────────────────────────────${NC}"
-  echo -e "${GREEN}  terrorserver installed successfully!${NC}"
-  echo -e "${GREEN}────────────────────────────────────────${NC}"
-  echo ""
-  echo "  Config file:    $CONFIG_FILE"
-  echo "  Listen address: $LISTEN_ADDR"
-  echo "  Binary:         $INSTALL_PATH"
-  echo "  Welcome page:   $WEB_INDEX"
-  echo ""
-  echo "  Useful commands:"
-  echo "    terror validate          — check config syntax"
-  echo "    terror status            — show status"
-  echo "    systemctl status terror  — systemd status"
-  echo "    journalctl -u terror -f  — live logs"
-  echo ""
-  echo "  Edit the config file and changes apply instantly (no restart)."
-  echo ""
-  echo "  Built by: $AUTHOR_NAME"
-  echo "  Portfolio:   $AUTHOR_URL"
-  echo "  Project:  https://github.com/$REPO"
-  echo ""
-  echo "  If you find any issues or have suggestions, feel free to raise a pull request."
+  local CYAN='\033[0;36m'
+  local GRAY='\033[0;90m'
+  local WHITE='\033[1;37m'
+  local BOLD='\033[1m'
+
+  echo -e ""
+  echo -e "  ${RED}${BOLD}▲ TERRORSERVER${NC} ${GRAY}v${CHANNEL}${NC}"
+  echo -e "  ${GREEN}Successfully deployed to your system${NC}"
+  echo -e ""
+  
+  echo -e "  ${WHITE}${BOLD}RESOURCES${NC}"
+  echo -e "  ${GRAY}├─${NC} ${BOLD}Endpoint:${NC}  ${CYAN}http://localhost${LISTEN_ADDR}${NC}"
+  echo -e "  ${GRAY}├─${NC} ${BOLD}Config:${NC}    ${GRAY}${CONFIG_FILE}${NC}"
+  echo -e "  ${GRAY}└─${NC} ${BOLD}Web Root:${NC}  ${GRAY}${WEB_ROOT}${NC}"
+  echo -e ""
+
+  echo -e "  ${WHITE}${BOLD}CONTROL${NC}"
+  echo -e "  ${GRAY}•${NC} ${CYAN}terror validate${NC}    ${GRAY}Verify config syntax${NC}"
+  echo -e "  ${GRAY}•${NC} ${CYAN}terror status${NC}      ${GRAY}Check proxy health${NC}"
+  echo -e "  ${GRAY}•${NC} ${CYAN}journalctl -uf terror${NC}"
+  echo -e ""
+
+  echo -e "  ${WHITE}${BOLD}MAINTAINER${NC}"
+  echo -e "  ${GRAY}By${NC} ${AUTHOR_NAME} ${GRAY}(${AUTHOR_URL})${NC}"
+  echo -e "  ${GRAY}Docs: https://terror.softvenceomega.com/docs${NC}"
+  echo -e ""
+  
+  # A small "eye" icon as a nod to 'Terror'
+  echo -e "  ${RED}👁${NC} ${GRAY}Keep an eye on your traffic. Hot-reload is active.${NC}"
+  echo -e ""
 }
 
 main() {
