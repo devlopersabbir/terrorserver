@@ -13,6 +13,8 @@ SERVICE_FILE="/etc/systemd/system/terror.service"
 SERVICE_NAME="terror"
 AUTHOR_NAME="Sabbir Hossain Shuvo"
 AUTHOR_URL="https://devlopersabbir.github.io"
+FORCE_YES=false
+
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -38,6 +40,10 @@ require_systemctl() {
 }
 
 confirm() {
+  if [[ "$FORCE_YES" == "true" ]]; then
+    return
+  fi
+
   local CYAN='\033[0;36m'
   local GRAY='\033[0;90m'
   local WHITE='\033[1;37m'
@@ -50,7 +56,10 @@ confirm() {
   echo -e "  ${GRAY}├─${NC} ${BOLD}Config:${NC}   ${GRAY}${CONFIG_FILE}${NC}"
   echo -e "  ${GRAY}└─${NC} ${BOLD}Web Root:${NC} ${GRAY}${WEB_ROOT}${NC}"
   echo -e ""
-  read -rp "$(echo -e "  ${CYAN}Continue uninstall?${NC} [y/N] ")" answer
+  
+  # Read from /dev/tty to avoid consuming the script when piped from curl
+  read -rp "$(echo -e "  ${CYAN}Continue uninstall?${NC} [y/N] ")" answer < /dev/tty || answer="n"
+  
   case "$answer" in
     [yY][eE][sS]|[yY]) ;;
     *)
@@ -103,7 +112,13 @@ remove_binary() {
 
 remove_config() {
   if [[ -d "$CONFIG_DIR" ]]; then
-    read -rp "Remove config directory $CONFIG_DIR? [y/N] " answer
+    local answer
+    if [[ "$FORCE_YES" == "true" ]]; then
+      answer="y"
+    else
+      read -rp "Remove config directory $CONFIG_DIR? [y/N] " answer < /dev/tty || answer="n"
+    fi
+
     case "$answer" in
       [yY][eE][sS]|[yY])
         log_info "Removing config: $CONFIG_DIR"
@@ -120,7 +135,13 @@ remove_config() {
 
 remove_welcome_site() {
   if [[ -d "$WEB_ROOT" ]]; then
-    read -rp "Remove welcome site directory $WEB_ROOT? [y/N] " answer
+    local answer
+    if [[ "$FORCE_YES" == "true" ]]; then
+      answer="y"
+    else
+      read -rp "Remove welcome site directory $WEB_ROOT? [y/N] " answer < /dev/tty || answer="n"
+    fi
+
     case "$answer" in
       [yY][eE][sS]|[yY])
         log_info "Removing welcome site: $WEB_ROOT"
@@ -158,6 +179,12 @@ print_done() {
 }
 
 main() {
+  for arg in "$@"; do
+    case "$arg" in
+      -y|--yes) FORCE_YES=true ;;
+    esac
+  done
+
   require_root
   require_systemctl
   confirm

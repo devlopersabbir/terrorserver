@@ -192,8 +192,8 @@ print_success() {
   local BOLD='\033[1m'
 
   echo -e ""
-  echo -e "  ${RED}${BOLD}▲ TERRORSERVER${NC} ${GRAY}v${CHANNEL}${NC}"
-  echo -e "  ${GREEN}Successfully deployed to your system${NC}"
+  echo -e "  ${RED}${BOLD}▲ TERRORSERVER${NC} ${GRAY}Installed${NC}"
+  echo -e "  ${GREEN}Successfully installed to your system${NC}"
   echo -e ""
   
   echo -e "  ${WHITE}${BOLD}RESOURCES${NC}"
