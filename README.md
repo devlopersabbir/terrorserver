@@ -20,13 +20,11 @@ A minimal, production-grade domain-based router, reverse proxy, and static file 
 ## Installation
 
 ```bash
-git clone https://github.com/terrorserver/terror
-cd terror
-sudo bash scripts/install.sh
+curl -fsSL https://raw.githubusercontent.com/devlopersabbir/terrorserver/main/scripts/install.sh | sudo bash
 ```
 
 The installer will:
-1. Build the binary
+1. Pull the latest stable release from GitHub
 2. Install to `/usr/local/bin/terror`
 3. Create config at `/etc/terror/Runtime`
 4. Register and start a `systemd` service

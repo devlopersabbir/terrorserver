@@ -1,0 +1,102 @@
+name: Release Stable
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Prepare release version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          latest_tag="$(git tag -l 'v*-stable' --sort=-v:refname | head -n 1 || true)"
+
+          if [[ -z "$latest_tag" ]]; then
+            next_tag="v1.0.0-stable"
+            range=""
+          else
+            version="${latest_tag#v}"
+            version="${version%-stable}"
+            IFS='.' read -r major minor patch <<< "$version"
+            patch="$((patch + 1))"
+            next_tag="v${major}.${minor}.${patch}-stable"
+            range="${latest_tag}..HEAD"
+          fi
+
+          {
+            echo "tag=$next_tag"
+            echo "previous_tag=$latest_tag"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## $next_tag"
+            echo
+            echo "### Commit Log"
+            if [[ -z "$range" ]]; then
+              git log --pretty='- %s (%h)'
+            else
+              git log "$range" --pretty='- %s (%h)'
+            fi
+          } > RELEASE_NOTES.md
+
+      - name: Build release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p dist
+
+          ldflags="-s -w -X main.version=${{ steps.version.outputs.tag }}"
+
+          GOOS=linux GOARCH=amd64 go build -ldflags="$ldflags" -o dist/terror-linux-amd64 ./cmd/terror
+          GOOS=linux GOARCH=arm64 go build -ldflags="$ldflags" -o dist/terror-linux-arm64 ./cmd/terror
+
+          cd dist
+          sha256sum terror-linux-amd64 terror-linux-arm64 > checksums.txt
+
+      - name: Create git tag
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.version.outputs.tag }}"
+          git push origin "${{ steps.version.outputs.tag }}"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          gh release create "${{ steps.version.outputs.tag }}" \
+            dist/terror-linux-amd64 \
+            dist/terror-linux-arm64 \
+            dist/checksums.txt \
+            --title "${{ steps.version.outputs.tag }}" \
+            --notes-file RELEASE_NOTES.md \
+            --latest

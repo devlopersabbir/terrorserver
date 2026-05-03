@@ -3,7 +3,7 @@ set -euo pipefail
 
 # ─────────────────────────────────────────────
 # terrorserver install.sh
-# Builds and installs terrorserver as a systemd service
+# Installs terrorserver from the stable GitHub release as a systemd service
 # ─────────────────────────────────────────────
 
 BINARY_NAME="terror"
@@ -12,6 +12,11 @@ CONFIG_DIR="/etc/terror"
 CONFIG_FILE="$CONFIG_DIR/Runtime"
 SERVICE_FILE="/etc/systemd/system/terror.service"
 LISTEN_ADDR="${TERROR_ADDR:-:80}"
+REPO="${TERROR_REPO:-devlopersabbir/terrorserver}"
+CHANNEL="${TERROR_CHANNEL:-stable}"
+DOWNLOAD_BASE="https://github.com/$REPO/releases/latest/download"
+AUTHOR_NAME="Sabbir Hossain Shuvo"
+AUTHOR_URL="https://devlopersabbir.github.io"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -29,31 +34,62 @@ require_root() {
   fi
 }
 
-require_go() {
-  if ! command -v go &>/dev/null; then
-    log_error "Go is not installed. Install Go 1.21+ from https://go.dev/dl/"
-    exit 1
+require_downloader() {
+  if command -v curl &>/dev/null; then
+    DOWNLOADER="curl"
+    return
   fi
-  local goversion
-  goversion=$(go version | awk '{print $3}' | sed 's/go//')
-  log_info "Found Go $goversion"
+  if command -v wget &>/dev/null; then
+    DOWNLOADER="wget"
+    return
+  fi
+  log_error "curl or wget is required to download the GitHub release"
+  exit 1
 }
 
-build_binary() {
-  log_info "Building $BINARY_NAME..."
-  local script_dir
-  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  local repo_root
-  repo_root="$(cd "$script_dir/.." && pwd)"
+detect_asset() {
+  local os arch
+  os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+  arch="$(uname -m)"
 
-  cd "$repo_root"
-  go build -ldflags="-s -w" -o "$BINARY_NAME" ./cmd/terror
-  log_info "Build successful"
+  if [[ "$os" != "linux" ]]; then
+    log_error "This installer supports Linux systemd hosts only (detected: $os)"
+    exit 1
+  fi
+
+  case "$arch" in
+    x86_64|amd64) arch="amd64" ;;
+    aarch64|arm64) arch="arm64" ;;
+    *)
+      log_error "Unsupported CPU architecture: $arch"
+      exit 1
+      ;;
+  esac
+
+  RELEASE_ASSET="${TERROR_ASSET:-$BINARY_NAME-$os-$arch}"
+}
+
+download_binary() {
+  local url tmp_file
+  url="$DOWNLOAD_BASE/$RELEASE_ASSET"
+  tmp_file="$(mktemp)"
+
+  log_info "Pulling (-$CHANNEL) release from github"
+  log_info "Downloading $url"
+
+  if [[ "$DOWNLOADER" == "curl" ]]; then
+    curl -fsSL "$url" -o "$tmp_file"
+  else
+    wget -qO "$tmp_file" "$url"
+  fi
+
+  chmod 755 "$tmp_file"
+  DOWNLOADED_BINARY="$tmp_file"
 }
 
 install_binary() {
   log_info "Installing binary to $INSTALL_PATH"
-  mv "$BINARY_NAME" "$INSTALL_PATH"
+  mv "$DOWNLOADED_BINARY" "$INSTALL_PATH"
   chmod 755 "$INSTALL_PATH"
 }
 
@@ -91,7 +127,7 @@ install_service() {
   cat > "$SERVICE_FILE" <<EOF
 [Unit]
 Description=terrorserver — minimal domain router & reverse proxy
-Documentation=https://github.com/terrorserver/terror
+Documentation=https://github.com/devlopersabbir/terrorserver
 After=network.target
 Wants=network-online.target
 
@@ -139,12 +175,18 @@ print_success() {
   echo ""
   echo "  Edit the config file and changes apply instantly (no restart)."
   echo ""
+  echo "  Built by: $AUTHOR_NAME"
+  echo "  Portfolio:   $AUTHOR_URL"
+  echo "  Project:  https://github.com/$REPO"
+  echo ""
+  echo "  If you find any issues or have suggestions, feel free to raise a pull request."
 }
 
 main() {
   require_root
-  require_go
-  build_binary
+  require_downloader
+  detect_asset
+  download_binary
   install_binary
   create_config
   install_service

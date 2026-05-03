@@ -9,15 +9,16 @@ import (
 	"time"
 
 	"github.com/devlopersabbir/terrorserver/internal/logger"
-	"github.com/terrorserver/terrorserver/internal/server"
-	"github.com/terrorserver/terrorserver/internal/watcher"
+	"github.com/devlopersabbir/terrorserver/internal/server"
+	"github.com/devlopersabbir/terrorserver/internal/watcher"
 )
 
 const (
 	defaultConfigPath = "/etc/terror/Runtime"
 	defaultAddr       = ":80"
-	version           = "1.0.0"
 )
+
+var version = "dev"
 
 func main() {
 	if len(os.Args) < 2 {
