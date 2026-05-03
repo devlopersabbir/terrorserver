@@ -18,7 +18,7 @@ const (
 	defaultAddr       = ":80"
 )
 
-var version = "dev"
+var version = "prod"
 
 func main() {
 	if len(os.Args) < 2 {
