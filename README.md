@@ -20,7 +20,7 @@ A minimal, production-grade domain-based router, reverse proxy, and static file 
 ## Installation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/devlopersabbir/terrorserver/main/scripts/install.sh | sudo bash
+curl -fsSL https://terror.softvenceomega.com/install.sh | sudo bash
 ```
 
 The installer will:
@@ -127,7 +127,7 @@ make build-all
 ## Uninstall
 
 ```bash
-sudo bash scripts/uninstall.sh
+curl -fsSL https://terror.softvenceomega.com/uninstall.sh | sudo bash
 ```
 
 ---
