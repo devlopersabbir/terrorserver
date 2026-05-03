@@ -18,8 +18,33 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
+      - name: Check installer script changes
+        id: changes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          before="${{ github.event.workflow_run.head_sha }}"
+          parent="$(git rev-parse "$before^" 2>/dev/null || true)"
+
+          if [[ -z "$parent" ]]; then
+            changed_files="$(git show --pretty='' --name-only "$before")"
+          else
+            changed_files="$(git diff --name-only "$parent" "$before")"
+          fi
+
+          if grep -Eq '^scripts/(install|uninstall)\.sh$' <<< "$changed_files"; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Copy scripts with SCP
+        if: ${{ steps.changes.outputs.changed == 'true' }}
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.HOST }}
