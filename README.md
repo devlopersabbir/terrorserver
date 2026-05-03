@@ -1,0 +1,169 @@
+# terrorserver
+
+A minimal, production-grade domain-based router, reverse proxy, and static file server.
+
+**No plugins. No middleware chains. No complexity. Just routes.**
+
+---
+
+## Features
+
+- **Domain-based routing** — route by hostname or port
+- **Reverse proxy** — transparent upstream forwarding
+- **Static file server** — with SPA fallback support
+- **Live reload** — edit config, changes apply instantly, zero downtime
+- **Single binary** — no runtime dependencies
+- **Systemd integration** — production-ready service management
+
+---
+
+## Installation
+
+```bash
+git clone https://github.com/terrorserver/terror
+cd terror
+sudo bash scripts/install.sh
+```
+
+The installer will:
+1. Build the binary
+2. Install to `/usr/local/bin/terror`
+3. Create config at `/etc/terror/Runtime`
+4. Register and start a `systemd` service
+
+### Environment variables
+
+| Variable        | Default                | Description              |
+|-----------------|------------------------|--------------------------|
+| `TERROR_CONFIG` | `/etc/terror/Runtime`  | Path to config file      |
+| `TERROR_ADDR`   | `:80`                  | Listen address           |
+
+---
+
+## Config
+
+Edit `/etc/terror/Runtime`. Changes are detected and applied **instantly** — no restart needed.
+
+```
+# Reverse proxy
+api.example.com {
+    proxy localhost:5000
+}
+
+# Static file server (with SPA fallback)
+app.example.com {
+    root /var/www/html
+    file_server
+}
+
+# Port-based proxy (any host on :4000)
+:4000 {
+    proxy localhost:3000
+}
+```
+
+### Rules
+
+- One block per domain or port
+- Each block must have exactly one of `proxy` or `file_server`
+- `file_server` requires a `root` directive
+- Comments start with `#`
+- Unknown directives are a parse error (fail-fast)
+
+---
+
+## Commands
+
+```bash
+terror                  # Start the server (default)
+terror serve            # Start the server
+terror validate         # Validate config without starting
+terror status           # Show runtime status
+terror version          # Print version
+terror help             # Show help
+```
+
+---
+
+## Live Reload
+
+terrorserver watches the config file with `fsnotify`. When a change is detected:
+
+1. Config is re-parsed
+2. If valid → routing table is atomically swapped in memory
+3. If invalid → old config remains active, error is logged
+
+**No connections are dropped. No restart happens.**
+
+---
+
+## Failure Behavior
+
+| Situation               | Response                          |
+|-------------------------|-----------------------------------|
+| Invalid config on reload| Keep old config, log error        |
+| Proxy upstream down     | `502 Bad Gateway`                 |
+| Static file not found   | `404 Not Found`                   |
+| Unknown domain/host     | `404 Not Found`                   |
+
+---
+
+## Development
+
+```bash
+# Run tests
+make test
+
+# Build binary
+make build
+
+# Run locally (uses testdata/Runtime, port 8080)
+make run
+
+# Cross-compile for Linux/macOS
+make build-all
+```
+
+---
+
+## Uninstall
+
+```bash
+sudo bash scripts/uninstall.sh
+```
+
+---
+
+## Architecture
+
+```
+terrorserver
+ ├── cmd/terror/         CLI entrypoint
+ ├── internal/
+ │   ├── config/         Config parser + Route types
+ │   ├── proxy/          Reverse proxy pool
+ │   ├── server/         HTTP engine + routing
+ │   ├── watcher/        fsnotify file watcher
+ │   └── logger/         Structured stdout logger
+ ├── scripts/
+ │   ├── install.sh
+ │   └── uninstall.sh
+ └── testdata/           Example config
+```
+
+Request path:
+```
+Incoming Request
+  → Extract Host + Port
+  → O(1) map lookup (atomic read)
+  → proxy handler  OR  static handler
+  → Response
+```
+
+No middleware. No plugin system. No dynamic logic.
+
+---
+
+## License
+
+MIT
