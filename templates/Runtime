@@ -1,16 +1,16 @@
 # -----------------------------------------------------------------------------
 #  TERRORSERVER RUNTIME CONFIGURATION
 # -----------------------------------------------------------------------------
-#  Author:    Sabbir Hossain Shuvo
-#  Portfolio: https://devlopersabbir.github.io
+#  Author:    {{AUTHOR_NAME}}
+#  Portfolio: {{AUTHOR_URL}}
 #  Docs:      https://terror.softvenceomega.com/docs
 #  Repo:      https://github.com/devlopersabbir/terrorserver
 #
 #  Changes to this file are hot-reloaded automatically.
 # -----------------------------------------------------------------------------
 
-:80 {
-    root /var/www/terrorserver
+{{LISTEN_ADDR}} {
+    root {{WEB_ROOT}}
     file_server
 }
 

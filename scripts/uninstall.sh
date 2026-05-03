@@ -7,9 +7,12 @@ set -euo pipefail
 
 INSTALL_PATH="/usr/local/bin/terror"
 CONFIG_DIR="/etc/terror"
+CONFIG_FILE="$CONFIG_DIR/Runtime"
 WEB_ROOT="${TERROR_WEB_ROOT:-/var/www/terrorserver}"
 SERVICE_FILE="/etc/systemd/system/terror.service"
 SERVICE_NAME="terror"
+AUTHOR_NAME="Sabbir Hossain Shuvo"
+AUTHOR_URL="https://devlopersabbir.github.io"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -35,11 +38,25 @@ require_systemctl() {
 }
 
 confirm() {
-  read -rp "Are you sure you want to uninstall terrorserver? [y/N] " answer
+  local CYAN='\033[0;36m'
+  local GRAY='\033[0;90m'
+  local WHITE='\033[1;37m'
+  local BOLD='\033[1m'
+
+  echo -e ""
+  echo -e "  ${RED}${BOLD}▲ TERRORSERVER${NC} ${GRAY}uninstall${NC}"
+  echo -e "  ${WHITE}${BOLD}TARGETS${NC}"
+  echo -e "  ${GRAY}├─${NC} ${BOLD}Binary:${NC}   ${GRAY}${INSTALL_PATH}${NC}"
+  echo -e "  ${GRAY}├─${NC} ${BOLD}Config:${NC}   ${GRAY}${CONFIG_FILE}${NC}"
+  echo -e "  ${GRAY}└─${NC} ${BOLD}Web Root:${NC} ${GRAY}${WEB_ROOT}${NC}"
+  echo -e ""
+  read -rp "$(echo -e "  ${CYAN}Continue uninstall?${NC} [y/N] ")" answer
   case "$answer" in
     [yY][eE][sS]|[yY]) ;;
     *)
-      echo "Aborted."
+      echo -e ""
+      echo -e "  ${YELLOW}[WARN]${NC} Uninstall aborted."
+      echo -e ""
       exit 0
       ;;
   esac
@@ -119,9 +136,25 @@ remove_welcome_site() {
 }
 
 print_done() {
-  echo ""
-  echo -e "${GREEN}terrorserver has been uninstalled.${NC}"
-  echo ""
+  local CYAN='\033[0;36m'
+  local GRAY='\033[0;90m'
+  local WHITE='\033[1;37m'
+  local BOLD='\033[1m'
+
+  echo -e ""
+  echo -e "  ${RED}${BOLD}▲ TERRORSERVER${NC} ${GRAY}removed${NC}"
+  echo -e "  ${GREEN}Successfully uninstalled from your system${NC}"
+  echo -e ""
+  echo -e "  ${WHITE}${BOLD}SUMMARY${NC}"
+  echo -e "  ${GRAY}├─${NC} ${BOLD}Service:${NC}  ${CYAN}${SERVICE_NAME}${NC} stopped and disabled"
+  echo -e "  ${GRAY}├─${NC} ${BOLD}Binary:${NC}   ${GRAY}${INSTALL_PATH}${NC}"
+  echo -e "  ${GRAY}├─${NC} ${BOLD}Config:${NC}   ${GRAY}${CONFIG_DIR}${NC}"
+  echo -e "  ${GRAY}└─${NC} ${BOLD}Web Root:${NC} ${GRAY}${WEB_ROOT}${NC}"
+  echo -e ""
+  echo -e "  ${WHITE}${BOLD}MAINTAINER${NC}"
+  echo -e "  ${GRAY}By${NC} ${AUTHOR_NAME} ${GRAY}(${AUTHOR_URL})${NC}"
+  echo -e "  ${GRAY}Docs: https://terror.softvenceomega.com/docs${NC}"
+  echo -e ""
 }
 
 main() {
