@@ -14,6 +14,7 @@ import (
 	"github.com/devlopersabbir/terrorserver/internal/config"
 	"github.com/devlopersabbir/terrorserver/internal/logger"
 	"github.com/devlopersabbir/terrorserver/internal/proxy"
+	"github.com/devlopersabbir/terrorserver/templates"
 )
 
 // routingTable is the live lookup map, swapped atomically on reload.
@@ -24,6 +25,7 @@ type routingTable struct {
 // Server is the core terrorserver HTTP engine.
 type Server struct {
 	configPath string
+	listenAddr string
 	tablePtr   unsafe.Pointer // *routingTable
 	proxyPool  *proxy.Pool
 	httpServer *http.Server
@@ -112,6 +114,7 @@ func (s *Server) lookup(r *http.Request) (config.Route, bool) {
 // Start binds the server and begins serving.
 func (s *Server) Start(addr string) error {
 	s.startedAt = time.Now()
+	s.listenAddr = addr
 
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {
@@ -149,6 +152,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	route, ok := s.lookup(r)
 	if !ok {
+		if s.shouldServeWelcome(r) {
+			s.handleWelcome(rw)
+			logger.Request(r.Method, r.Host, r.URL.Path, rw.code, time.Since(start))
+			return
+		}
 		http.Error(rw, "Not Found", http.StatusNotFound)
 		logger.Request(r.Method, r.Host, r.URL.Path, rw.code, time.Since(start))
 		return
@@ -164,6 +172,38 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Request(r.Method, r.Host, r.URL.Path, rw.code, time.Since(start))
+}
+
+func (s *Server) shouldServeWelcome(r *http.Request) bool {
+	if portFromAddr(s.listenAddr) == "80" {
+		return true
+	}
+	if s.listener != nil && portFromAddr(s.listener.Addr().String()) == "80" {
+		return true
+	}
+	if _, port, err := net.SplitHostPort(r.Host); err == nil {
+		return port == "80"
+	}
+	return false
+}
+
+func portFromAddr(addr string) string {
+	if addr == "" {
+		return ""
+	}
+	if strings.HasPrefix(addr, ":") {
+		return strings.TrimPrefix(addr, ":")
+	}
+	if _, port, err := net.SplitHostPort(addr); err == nil {
+		return port
+	}
+	return ""
+}
+
+func (s *Server) handleWelcome(w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write([]byte(templates.WelcomePageHTML))
 }
 
 func (s *Server) handleProxy(w http.ResponseWriter, r *http.Request, route config.Route) {
