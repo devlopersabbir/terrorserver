@@ -7,6 +7,7 @@ set -euo pipefail
 
 INSTALL_PATH="/usr/local/bin/terror"
 CONFIG_DIR="/etc/terror"
+WEB_ROOT="${TERROR_WEB_ROOT:-/var/www/terrorserver}"
 SERVICE_FILE="/etc/systemd/system/terror.service"
 SERVICE_NAME="terror"
 
@@ -100,6 +101,23 @@ remove_config() {
   fi
 }
 
+remove_welcome_site() {
+  if [[ -d "$WEB_ROOT" ]]; then
+    read -rp "Remove welcome site directory $WEB_ROOT? [y/N] " answer
+    case "$answer" in
+      [yY][eE][sS]|[yY])
+        log_info "Removing welcome site: $WEB_ROOT"
+        rm -rf "$WEB_ROOT"
+        ;;
+      *)
+        log_warn "Keeping welcome site at $WEB_ROOT"
+        ;;
+    esac
+  else
+    log_warn "Welcome site directory not found at $WEB_ROOT — skipping"
+  fi
+}
+
 print_done() {
   echo ""
   echo -e "${GREEN}terrorserver has been uninstalled.${NC}"
@@ -113,6 +131,7 @@ main() {
   stop_service
   remove_binary
   remove_config
+  remove_welcome_site
   print_done
 }
 

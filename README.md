@@ -35,6 +35,7 @@ The installer will:
 |-----------------|------------------------|--------------------------|
 | `TERROR_CONFIG` | `/etc/terror/Runtime`  | Path to config file      |
 | `TERROR_ADDR`   | `:80`                  | Listen address           |
+| `TERROR_WEB_ROOT` | `/var/www/terrorserver` | Default welcome site root |
 
 ---
 
