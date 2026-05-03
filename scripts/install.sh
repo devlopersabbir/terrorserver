@@ -108,10 +108,11 @@ install_binary() {
 }
 
 create_config() {
-  if [[ -d "$CONFIG_DIR" ]]; then
-    log_warn "Config directory $CONFIG_DIR already exists — skipping"
+  if [[ -f "$CONFIG_FILE" ]]; then
+    log_warn "Config file $CONFIG_FILE already exists — skipping"
     return
   fi
+
   log_info "Creating config directory at $CONFIG_DIR"
   mkdir -p "$CONFIG_DIR"
 
@@ -211,9 +212,7 @@ print_success() {
   echo -e "  ${GRAY}By${NC} ${AUTHOR_NAME} ${GRAY}(${AUTHOR_URL})${NC}"
   echo -e "  ${GRAY}Docs: https://terror.softvenceomega.com/docs${NC}"
   echo -e ""
-  
-  # A small "eye" icon as a nod to 'Terror'
-  echo -e "  ${RED}👁${NC} ${GRAY}Keep an eye on your traffic. Hot-reload is active.${NC}"
+  echo -e "  ${RED}${BOLD}watch:${NC} ${GRAY}Hot-reload is active. Keep an eye on your traffic.${NC}"
   echo -e ""
 }
 
