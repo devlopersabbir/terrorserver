@@ -1,20 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ─────────────────────────────────────────────
-# terrorserver install.sh
-# Installs terrorserver from the stable GitHub release as a systemd service
-# ─────────────────────────────────────────────
-
 BINARY_NAME="terror"
 INSTALL_PATH="/usr/local/bin/terror"
 CONFIG_DIR="/etc/terror"
 CONFIG_FILE="$CONFIG_DIR/Runtime"
+WEB_ROOT="${TERROR_WEB_ROOT:-/var/www/terrorserver}"
+WEB_INDEX="$WEB_ROOT/index.html"
 SERVICE_FILE="/etc/systemd/system/terror.service"
 LISTEN_ADDR="${TERROR_ADDR:-:80}"
 REPO="${TERROR_REPO:-devlopersabbir/terrorserver}"
 CHANNEL="${TERROR_CHANNEL:-stable}"
 DOWNLOAD_BASE="https://github.com/$REPO/releases/latest/download"
+TEMPLATE_BASE="${TERROR_TEMPLATE_BASE:-https://terror.softvenceomega.com}"
 AUTHOR_NAME="Sabbir Hossain Shuvo"
 AUTHOR_URL="https://devlopersabbir.github.io"
 
@@ -87,6 +85,22 @@ download_binary() {
   DOWNLOADED_BINARY="$tmp_file"
 }
 
+download_file() {
+  local url dest
+  url="$1"
+  dest="$2"
+
+  if [[ "$DOWNLOADER" == "curl" ]]; then
+    curl -fsSL "$url" -o "$dest"
+  else
+    wget -qO "$dest" "$url"
+  fi
+}
+
+escape_sed() {
+  printf '%s' "$1" | sed 's/[\/&]/\\&/g'
+}
+
 install_binary() {
   log_info "Installing binary to $INSTALL_PATH"
   mv "$DOWNLOADED_BINARY" "$INSTALL_PATH"
@@ -101,25 +115,38 @@ create_config() {
   log_info "Creating config directory at $CONFIG_DIR"
   mkdir -p "$CONFIG_DIR"
 
+  local template
+  template="$(mktemp)"
+
+  log_info "Pulling Runtime template from $TEMPLATE_BASE/Runtime"
+  download_file "$TEMPLATE_BASE/Runtime" "$template"
+
   log_info "Writing example config to $CONFIG_FILE"
-  cat > "$CONFIG_FILE" <<'EOF'
-# terrorserver Runtime config
-# Edit this file — changes are reloaded automatically (no restart needed)
+  sed \
+    -e "s/{{LISTEN_ADDR}}/$(escape_sed "$LISTEN_ADDR")/g" \
+    -e "s/{{WEB_ROOT}}/$(escape_sed "$WEB_ROOT")/g" \
+    -e "s/{{AUTHOR_NAME}}/$(escape_sed "$AUTHOR_NAME")/g" \
+    -e "s/{{AUTHOR_URL}}/$(escape_sed "$AUTHOR_URL")/g" \
+    "$template" > "$CONFIG_FILE"
 
-# example.com {
-#     proxy localhost:3000
-# }
-
-# static.example.com {
-#     root /var/www/html
-#     file_server
-# }
-
-# :8080 {
-#     proxy localhost:8081
-# }
-EOF
+  rm -f "$template"
   chmod 644 "$CONFIG_FILE"
+}
+
+create_welcome_site() {
+  log_info "Creating default welcome page at $WEB_INDEX"
+  mkdir -p "$WEB_ROOT"
+
+  if [[ -f "$WEB_INDEX" ]]; then
+    log_warn "Welcome page $WEB_INDEX already exists — skipping"
+    return
+  fi
+
+  log_info "Pulling welcome page from $TEMPLATE_BASE/welcome.html"
+  download_file "$TEMPLATE_BASE/welcome.html" "$WEB_INDEX"
+
+  chmod 755 "$WEB_ROOT"
+  chmod 644 "$WEB_INDEX"
 }
 
 install_service() {
@@ -158,28 +185,36 @@ EOF
 }
 
 print_success() {
-  echo ""
-  echo -e "${GREEN}────────────────────────────────────────${NC}"
-  echo -e "${GREEN}  terrorserver installed successfully!${NC}"
-  echo -e "${GREEN}────────────────────────────────────────${NC}"
-  echo ""
-  echo "  Config file:    $CONFIG_FILE"
-  echo "  Listen address: $LISTEN_ADDR"
-  echo "  Binary:         $INSTALL_PATH"
-  echo ""
-  echo "  Useful commands:"
-  echo "    terror validate          — check config syntax"
-  echo "    terror status            — show status"
-  echo "    systemctl status terror  — systemd status"
-  echo "    journalctl -u terror -f  — live logs"
-  echo ""
-  echo "  Edit the config file and changes apply instantly (no restart)."
-  echo ""
-  echo "  Built by: $AUTHOR_NAME"
-  echo "  Portfolio:   $AUTHOR_URL"
-  echo "  Project:  https://github.com/$REPO"
-  echo ""
-  echo "  If you find any issues or have suggestions, feel free to raise a pull request."
+  local CYAN='\033[0;36m'
+  local GRAY='\033[0;90m'
+  local WHITE='\033[1;37m'
+  local BOLD='\033[1m'
+
+  echo -e ""
+  echo -e "  ${RED}${BOLD}▲ TERRORSERVER${NC} ${GRAY}v${CHANNEL}${NC}"
+  echo -e "  ${GREEN}Successfully deployed to your system${NC}"
+  echo -e ""
+  
+  echo -e "  ${WHITE}${BOLD}RESOURCES${NC}"
+  echo -e "  ${GRAY}├─${NC} ${BOLD}Endpoint:${NC}  ${CYAN}http://localhost${LISTEN_ADDR}${NC}"
+  echo -e "  ${GRAY}├─${NC} ${BOLD}Config:${NC}    ${GRAY}${CONFIG_FILE}${NC}"
+  echo -e "  ${GRAY}└─${NC} ${BOLD}Web Root:${NC}  ${GRAY}${WEB_ROOT}${NC}"
+  echo -e ""
+
+  echo -e "  ${WHITE}${BOLD}CONTROL${NC}"
+  echo -e "  ${GRAY}•${NC} ${CYAN}terror validate${NC}    ${GRAY}Verify config syntax${NC}"
+  echo -e "  ${GRAY}•${NC} ${CYAN}terror status${NC}      ${GRAY}Check proxy health${NC}"
+  echo -e "  ${GRAY}•${NC} ${CYAN}journalctl -uf terror${NC}"
+  echo -e ""
+
+  echo -e "  ${WHITE}${BOLD}MAINTAINER${NC}"
+  echo -e "  ${GRAY}By${NC} ${AUTHOR_NAME} ${GRAY}(${AUTHOR_URL})${NC}"
+  echo -e "  ${GRAY}Docs: https://terror.softvenceomega.com/docs${NC}"
+  echo -e ""
+  
+  # A small "eye" icon as a nod to 'Terror'
+  echo -e "  ${RED}👁${NC} ${GRAY}Keep an eye on your traffic. Hot-reload is active.${NC}"
+  echo -e ""
 }
 
 main() {
@@ -188,6 +223,7 @@ main() {
   detect_asset
   download_binary
   install_binary
+  create_welcome_site
   create_config
   install_service
   print_success
