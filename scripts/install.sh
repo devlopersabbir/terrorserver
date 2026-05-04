@@ -10,6 +10,8 @@ WEB_INDEX="$WEB_ROOT/index.html"
 CERT_CACHE="${TERROR_CERT_CACHE:-/var/lib/terror/certs}"
 CERT_DIR="$(dirname "$CERT_CACHE")"
 SERVICE_FILE="/etc/systemd/system/terror.service"
+RESTART_SERVICE_FILE="/etc/systemd/system/terror-restart.service"
+PATH_FILE="/etc/systemd/system/terror.path"
 LISTEN_ADDR="${TERROR_ADDR:-:80}"
 REPO="${TERROR_REPO:-devlopersabbir/terrorserver}"
 CHANNEL="${TERROR_CHANNEL:-stable}"
@@ -188,11 +190,39 @@ AmbientCapabilities=CAP_NET_BIND_SERVICE
 [Install]
 WantedBy=multi-user.target
 EOF
+}
+
+install_runtime_watcher() {
+  log_info "Creating Runtime restart helper at $RESTART_SERVICE_FILE"
+  cat > "$RESTART_SERVICE_FILE" <<EOF
+[Unit]
+Description=Restart terror after Runtime change
+
+[Service]
+Type=oneshot
+ExecStart=/bin/systemctl restart terror.service
+EOF
+
+  log_info "Creating Runtime watcher at $PATH_FILE"
+  cat > "$PATH_FILE" <<EOF
+[Unit]
+Description=Watch terror Runtime config
+
+[Path]
+PathChanged=$CONFIG_FILE
+Unit=terror-restart.service
+
+[Install]
+WantedBy=multi-user.target
+EOF
 
   systemctl daemon-reload
   systemctl enable terror
+  systemctl enable terror.path
   systemctl start terror
+  systemctl start terror.path
   log_info "Service started. Check status with: systemctl status terror"
+  log_info "Runtime watcher started. Config changes restart terror automatically."
 }
 
 print_success() {
@@ -236,6 +266,7 @@ main() {
   create_cert_cache
   create_config
   install_service
+  install_runtime_watcher
   print_success
 }
 

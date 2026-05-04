@@ -11,6 +11,8 @@ CONFIG_FILE="$CONFIG_DIR/Runtime"
 WEB_ROOT="${TERROR_WEB_ROOT:-/var/www/terrorserver}"
 CERT_CACHE="${TERROR_CERT_CACHE:-/var/lib/terror/certs}"
 SERVICE_FILE="/etc/systemd/system/terror.service"
+RESTART_SERVICE_FILE="/etc/systemd/system/terror-restart.service"
+PATH_FILE="/etc/systemd/system/terror.path"
 SERVICE_NAME="terror"
 AUTHOR_NAME="Sabbir Hossain Shuvo"
 AUTHOR_URL="https://devlopersabbir.github.io"
@@ -74,6 +76,20 @@ confirm() {
 }
 
 stop_service() {
+  if systemctl is-active --quiet terror.path 2>/dev/null; then
+    log_info "Stopping terror Runtime watcher..."
+    systemctl stop terror.path
+  else
+    log_warn "terror Runtime watcher is not running — skipping stop"
+  fi
+
+  if systemctl is-enabled --quiet terror.path 2>/dev/null; then
+    log_info "Disabling terror Runtime watcher..."
+    systemctl disable terror.path
+  else
+    log_warn "terror Runtime watcher is not enabled — skipping disable"
+  fi
+
   if systemctl is-active --quiet "$SERVICE_NAME" 2>/dev/null; then
     log_info "Stopping $SERVICE_NAME service..."
     systemctl stop "$SERVICE_NAME"
@@ -104,6 +120,20 @@ stop_service() {
     rm -f "$SERVICE_FILE"
   else
     log_warn "Service file not found at $SERVICE_FILE — skipping"
+  fi
+
+  if [[ -f "$RESTART_SERVICE_FILE" ]]; then
+    log_info "Removing restart helper: $RESTART_SERVICE_FILE"
+    rm -f "$RESTART_SERVICE_FILE"
+  else
+    log_warn "Restart helper not found at $RESTART_SERVICE_FILE — skipping"
+  fi
+
+  if [[ -f "$PATH_FILE" ]]; then
+    log_info "Removing Runtime watcher: $PATH_FILE"
+    rm -f "$PATH_FILE"
+  else
+    log_warn "Runtime watcher not found at $PATH_FILE — skipping"
   fi
 
   systemctl daemon-reload
