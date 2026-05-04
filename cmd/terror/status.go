@@ -75,7 +75,11 @@ func printTLSStatus(routes []config.Route) {
 				fmt.Println("  warn ssl: automatic SSL disabled by TERROR_AUTO_TLS")
 			} else if canDialLocalPort("443") {
 				fmt.Println("  ok ssl: automatic Let's Encrypt SSL enabled")
-				fmt.Println("  ok ssl: domain HTTP redirects to HTTPS")
+				if httpsRedirectEnabled() {
+					fmt.Println("  ok ssl: domain HTTP redirects to HTTPS")
+				} else {
+					fmt.Println("  ok ssl: domain HTTP stays available; set TERROR_HTTPS_REDIRECT=true to force HTTPS")
+				}
 				printHTTPSProbe(host)
 			} else {
 				fmt.Println("  warn ssl: expected :443 listener is not reachable locally")
@@ -210,6 +214,11 @@ func hostOnly(host string) string {
 func autoTLSDisabled() bool {
 	v := strings.ToLower(strings.TrimSpace(os.Getenv("TERROR_AUTO_TLS")))
 	return v == "0" || v == "false" || v == "no"
+}
+
+func httpsRedirectEnabled() bool {
+	v := strings.ToLower(strings.TrimSpace(os.Getenv("TERROR_HTTPS_REDIRECT")))
+	return v == "1" || v == "true" || v == "yes"
 }
 
 func expectedListenAddrs(defaultAddr string, routes []config.Route) []string {

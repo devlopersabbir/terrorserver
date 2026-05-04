@@ -48,3 +48,15 @@ func TestExpectedListenAddrs(t *testing.T) {
 		}
 	}
 }
+
+func TestHTTPSRedirectEnabled(t *testing.T) {
+	t.Setenv("TERROR_HTTPS_REDIRECT", "")
+	if httpsRedirectEnabled() {
+		t.Fatal("expected HTTPS redirect to be disabled by default")
+	}
+
+	t.Setenv("TERROR_HTTPS_REDIRECT", "true")
+	if !httpsRedirectEnabled() {
+		t.Fatal("expected HTTPS redirect to be enabled")
+	}
+}

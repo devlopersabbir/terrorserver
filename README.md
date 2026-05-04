@@ -11,7 +11,7 @@ It is designed for simple Linux servers where you want Caddy-like ergonomics wit
 - Reverse proxy support for local upstream apps.
 - Static file serving with index fallback for single-page apps.
 - Automatic Let's Encrypt certificates for domain routes.
-- HTTP to HTTPS redirects for domain routes.
+- Optional HTTP to HTTPS redirects for domain routes.
 - Default welcome page on port `80`.
 - Runtime health checks with `terror status`.
 - Systemd service hardening and automatic restart on Runtime changes.
@@ -139,7 +139,8 @@ When TLS is enabled:
 
 - Port `443` serves HTTPS for domain routes.
 - Port `80` handles ACME HTTP challenges.
-- Normal HTTP domain traffic redirects to HTTPS.
+- Normal HTTP domain traffic stays available by default while HTTPS is served on port `443`.
+- HTTP to HTTPS redirects can be enabled after certificate issuance is confirmed.
 - IP-based and port-based routes such as `:9090` stay on HTTP.
 
 Disable automatic TLS only when needed:
@@ -160,6 +161,13 @@ Then reload:
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl restart terror
+```
+
+Enable forced HTTPS redirects only after `https://your-domain` is confirmed healthy:
+
+```ini
+[Service]
+Environment=TERROR_HTTPS_REDIRECT=true
 ```
 
 ## Commands
@@ -199,7 +207,7 @@ ok service: terror is active
 ok listener: :80 is accepting local connections
 ok listener: :443 is accepting local connections
 ok ssl: automatic Let's Encrypt SSL enabled
-ok ssl: domain HTTP redirects to HTTPS
+ok ssl: domain HTTP stays available; set TERROR_HTTPS_REDIRECT=true to force HTTPS
 
 routes
 ok :80 -> static /var/www/terrorserver (serving static files)
@@ -250,6 +258,7 @@ The uninstaller stops and disables the systemd service, removes the binary and w
 | `TERROR_ADDR`          | `:80`                                          | Binary, installer      | Default listen address                                |
 | `TERROR_CERT_CACHE`    | `/var/lib/terror/certs`                        | Binary, installer      | Let's Encrypt certificate cache                       |
 | `TERROR_AUTO_TLS`      | enabled                                        | Binary                 | Set to `false`, `0`, or `no` to disable automatic TLS |
+| `TERROR_HTTPS_REDIRECT` | disabled                                      | Binary                 | Set to `true`, `1`, or `yes` to redirect domain HTTP traffic to HTTPS |
 | `TERROR_INSTALL_URL`   | `https://terror.softvenceomega.com/install.sh` | `terror update`        | Installer URL used by update command                  |
 | `TERROR_WEB_ROOT`      | `/var/www/terrorserver`                        | Installer, uninstaller | Default welcome page root                             |
 | `TERROR_TEMPLATE_BASE` | `https://terror.softvenceomega.com`            | Installer              | Host for `Runtime` and `welcome.html` templates       |

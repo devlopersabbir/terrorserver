@@ -82,6 +82,8 @@ func TestPortOnlyRouteMatchesHostWithoutPort(t *testing.T) {
 }
 
 func TestDomainHTTPRedirectsToHTTPS(t *testing.T) {
+	t.Setenv("TERROR_HTTPS_REDIRECT", "true")
+
 	cfg := filepath.Join(t.TempDir(), "Runtime")
 	runtime := `
 example.com {
@@ -112,6 +114,8 @@ example.com {
 }
 
 func TestPortHTTPDoesNotRedirectToHTTPS(t *testing.T) {
+	t.Setenv("TERROR_HTTPS_REDIRECT", "true")
+
 	cfg := filepath.Join(t.TempDir(), "Runtime")
 	runtime := `
 :9090 {
@@ -135,6 +139,14 @@ func TestPortHTTPDoesNotRedirectToHTTPS(t *testing.T) {
 
 	if rr.Code == http.StatusMovedPermanently {
 		t.Fatal("did not expect port route to redirect to HTTPS")
+	}
+}
+
+func TestHTTPSRedirectDisabledByDefault(t *testing.T) {
+	t.Setenv("TERROR_HTTPS_REDIRECT", "")
+
+	if httpsRedirectEnabled() {
+		t.Fatal("expected HTTPS redirects to be disabled by default")
 	}
 }
 

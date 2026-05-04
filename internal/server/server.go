@@ -90,13 +90,20 @@ func (s *Server) Start(addr string) error {
 			Cache:      autocert.DirCache(certCacheDir()),
 			HostPolicy: autocert.HostWhitelist(domains...),
 		}
-		httpHandler = manager.HTTPHandler(s.httpsRedirectHandler())
+		if httpsRedirectEnabled() {
+			httpHandler = manager.HTTPHandler(s.httpsRedirectHandler())
+		} else {
+			httpHandler = manager.HTTPHandler(s)
+		}
 		if err := s.startListener(":443", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			s.ServeHTTP(w, r)
 		}), &tls.Config{GetCertificate: manager.GetCertificate, MinVersion: tls.VersionTLS12}); err != nil {
 			return err
 		}
 		logger.Info("automatic SSL enabled for: %s", strings.Join(domains, ", "))
+		if httpsRedirectEnabled() {
+			logger.Info("domain HTTP to HTTPS redirects enabled")
+		}
 	}
 
 	for _, listen := range listenAddrs(addr, cfg.Routes, len(domains) > 0 && !autoTLSDisabled()) {
@@ -290,4 +297,9 @@ func certCacheDir() string {
 func autoTLSDisabled() bool {
 	v := strings.ToLower(strings.TrimSpace(os.Getenv("TERROR_AUTO_TLS")))
 	return v == "0" || v == "false" || v == "no"
+}
+
+func httpsRedirectEnabled() bool {
+	v := strings.ToLower(strings.TrimSpace(os.Getenv("TERROR_HTTPS_REDIRECT")))
+	return v == "1" || v == "true" || v == "yes"
 }
