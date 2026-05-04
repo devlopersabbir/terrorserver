@@ -134,32 +134,6 @@ curl -fsSL https://terror.softvenceomega.com/uninstall.sh | sudo bash
 
 ---
 
-## Architecture
-
-```
-terrorserver
- ├── cmd/terror/         CLI entrypoint
- ├── internal/
- │   ├── config/         Config parser + Route types
- │   ├── proxy/          Reverse proxy pool
- │   ├── server/         HTTP engine + routing
- │   ├── watcher/        fsnotify file watcher
- │   └── logger/         Structured stdout logger
- ├── scripts/
- │   ├── install.sh
- │   └── uninstall.sh
- └── testdata/           Example config
-```
-
-Request path:
-```
-Incoming Request
-  → Extract Host + Port
-  → O(1) map lookup (atomic read)
-  → proxy handler  OR  static handler
-  → Response
-```
-
 No middleware. No plugin system. No dynamic logic.
 
 ---
