@@ -1,0 +1,12 @@
+# Standard Go files handling
+*.go text eol=lf
+
+# Templates handling
+templates/*.html text eol=lf
+templates/*.tmpl text eol=lf
+
+# Scripts handling
+scripts/*.sh text eol=lf
+
+# Shell scripts embedded in README
+README.md text eol=lf
