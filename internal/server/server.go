@@ -90,7 +90,7 @@ func (s *Server) Start(addr string) error {
 			Cache:      autocert.DirCache(certCacheDir()),
 			HostPolicy: autocert.HostWhitelist(domains...),
 		}
-		httpHandler = manager.HTTPHandler(s.httpsRedirectHandler())
+		httpHandler = manager.HTTPHandler(s)
 		if err := s.startListener(":443", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			s.ServeHTTP(w, r)
 		}), &tls.Config{GetCertificate: manager.GetCertificate, MinVersion: tls.VersionTLS12}); err != nil {

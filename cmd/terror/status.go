@@ -72,7 +72,6 @@ func printTLSStatus(routes []config.Route) {
 				fmt.Println("  warn ssl: automatic SSL disabled by TERROR_AUTO_TLS")
 			} else if canDialLocalPort("443") {
 				fmt.Println("  ok ssl: automatic Let's Encrypt SSL enabled")
-				fmt.Println("  ok ssl: domain HTTP redirects to HTTPS")
 			} else {
 				fmt.Println("  warn ssl: expected :443 listener is not reachable locally")
 			}
