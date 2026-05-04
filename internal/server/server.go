@@ -90,7 +90,7 @@ func (s *Server) Start(addr string) error {
 			Cache:      autocert.DirCache(certCacheDir()),
 			HostPolicy: autocert.HostWhitelist(domains...),
 		}
-		httpHandler = manager.HTTPHandler(s)
+		httpHandler = manager.HTTPHandler(s.httpsRedirectHandler())
 		if err := s.startListener(":443", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			s.ServeHTTP(w, r)
 		}), &tls.Config{GetCertificate: manager.GetCertificate, MinVersion: tls.VersionTLS12}); err != nil {
@@ -105,6 +105,33 @@ func (s *Server) Start(addr string) error {
 		}
 	}
 	return nil
+}
+
+func (s *Server) httpsRedirectHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if s.shouldRedirectToHTTPS(r) {
+			target := "https://" + hostOnly(r.Host) + r.URL.RequestURI()
+			http.Redirect(w, r, target, http.StatusMovedPermanently)
+			return
+		}
+		s.ServeHTTP(w, r)
+	})
+}
+
+func (s *Server) shouldRedirectToHTTPS(r *http.Request) bool {
+	if r.TLS != nil || r.Method != http.MethodGet && r.Method != http.MethodHead {
+		return false
+	}
+	host := hostOnly(r.Host)
+	if host == "" || net.ParseIP(host) != nil || strings.HasPrefix(host, ":") {
+		return false
+	}
+	route, ok := router.Lookup(s.table(), router.RequestContext{
+		Host:         r.Host,
+		ListenAddr:   s.listenAddr,
+		ListenerAddr: listenerAddr(r),
+	})
+	return ok && route.Host != "" && !strings.HasPrefix(route.Host, ":")
 }
 
 // Shutdown gracefully stops the HTTP server.
@@ -240,6 +267,17 @@ func domainRoutes(routes []config.Route) []string {
 	}
 	sort.Strings(domains)
 	return domains
+}
+
+func hostOnly(host string) string {
+	host = strings.ToLower(strings.TrimSpace(host))
+	if strings.HasPrefix(host, ":") {
+		return host
+	}
+	if h, _, err := net.SplitHostPort(host); err == nil {
+		return h
+	}
+	return host
 }
 
 func certCacheDir() string {
