@@ -27,15 +27,15 @@ func main() {
 	}
 
 	switch os.Args[1] {
-	case "start", "serve":
+	case "start", "serve", "s":
 		runServe()
-	case "status":
+	case "status", "st":
 		runStatus()
-	case "validate":
+	case "validate", "v":
 		runValidate()
 	case "version", "--version", "-v":
 		fmt.Printf("terror version %s\n", version)
-	case "help", "--help", "-h":
+	case "help", "-h", "--help":
 		printHelp()
 	default:
 		fmt.Fprintf(os.Stderr, "unknown command: %s\n", os.Args[1])
@@ -130,28 +130,14 @@ Usage:
   terror [command]
 
 Commands:
-  start, serve    Start the server (default)
-  validate        Validate the config file without starting
-  status          Show runtime status
-  version         Print version
-  help            Show this help
+  start, serve   > [s] Start the server (default)
+  validate       > [v] Validate the config file without starting
+  status         > [st, s] Show runtime status
+  version        > [-v, --version] Print version
+  help           > [-h, --help] Show this help
 
 Environment:
   TERROR_CONFIG   Path to config file (default: /etc/terror/Runtime)
   TERROR_ADDR     Listen address (default: :80)
-
-Config example (/etc/terror/Runtime):
-  api.example.com {
-      proxy localhost:5000
-  }
-
-  app.example.com {
-      root /var/www/html
-      file_server
-  }
-
-  :4000 {
-      proxy localhost:3000
-  }
 `, version)
 }
