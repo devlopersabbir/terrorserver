@@ -60,3 +60,10 @@ jobs:
           source: "docs/.vitepress/dist"
           target: "/var/www/docs"
           strip_components: 1
+      - name: Restart caddy server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          password: ${{ secrets.PASSWORD }}
+          script: "sudo systemctl reload caddy"
