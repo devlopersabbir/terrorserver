@@ -1,6 +1,10 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/devlopersabbir/terrorserver/internal/config"
+)
 
 func TestNormalizeDialTarget(t *testing.T) {
 	tests := map[string]string{
@@ -25,5 +29,22 @@ func TestIsDomainRoute(t *testing.T) {
 	}
 	if isDomainRoute("127.0.0.1") {
 		t.Fatal("expected IP not to be a domain route")
+	}
+}
+
+func TestExpectedListenAddrs(t *testing.T) {
+	addrs := expectedListenAddrs(":80", []config.Route{
+		{Host: ":9090"},
+		{Host: "example.com"},
+	})
+
+	want := map[string]bool{":80": true, ":443": true, ":9090": true}
+	if len(addrs) != len(want) {
+		t.Fatalf("expected %d addrs, got %v", len(want), addrs)
+	}
+	for _, addr := range addrs {
+		if !want[addr] {
+			t.Fatalf("unexpected addr %q in %v", addr, addrs)
+		}
 	}
 }

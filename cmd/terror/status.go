@@ -35,6 +35,7 @@ func printStatus(cfgPath, addr string) {
 	fmt.Printf("  ok listen: %s\n", addr)
 	fmt.Printf("  ok routes: %d configured\n", len(cfg.Routes))
 	printServiceStatus()
+	printListenerStatus(expectedListenAddrs(addr, cfg.Routes))
 	printTLSStatus(cfg.Routes)
 
 	if len(cfg.Routes) == 0 {
@@ -69,10 +70,27 @@ func printTLSStatus(routes []config.Route) {
 		if isDomainRoute(route.Host) {
 			if autoTLSDisabled() {
 				fmt.Println("  warn ssl: automatic SSL disabled by TERROR_AUTO_TLS")
-			} else {
+			} else if canDialLocalPort("443") {
 				fmt.Println("  ok ssl: automatic Let's Encrypt SSL enabled")
+			} else {
+				fmt.Println("  warn ssl: expected :443 listener is not reachable locally")
 			}
 			return
+		}
+	}
+}
+
+func printListenerStatus(addrs []string) {
+	for _, addr := range addrs {
+		port := portFromListenAddr(addr)
+		if port == "" {
+			fmt.Printf("  warn listener: cannot inspect %s\n", addr)
+			continue
+		}
+		if canDialLocalPort(port) {
+			fmt.Printf("  ok listener: %s is accepting local connections\n", addr)
+		} else {
+			fmt.Printf("  x listener: %s is not accepting local connections\n", addr)
 		}
 	}
 }
@@ -163,4 +181,57 @@ func hostOnly(host string) string {
 func autoTLSDisabled() bool {
 	v := strings.ToLower(strings.TrimSpace(os.Getenv("TERROR_AUTO_TLS")))
 	return v == "0" || v == "false" || v == "no"
+}
+
+func expectedListenAddrs(defaultAddr string, routes []config.Route) []string {
+	seen := map[string]bool{}
+	var addrs []string
+	add := func(addr string) {
+		if addr == "" || seen[addr] {
+			return
+		}
+		seen[addr] = true
+		addrs = append(addrs, addr)
+	}
+
+	add(defaultAddr)
+	if hasDomainRoute(routes) && !autoTLSDisabled() {
+		add(":80")
+		add(":443")
+	}
+	for _, route := range routes {
+		if strings.HasPrefix(route.Host, ":") {
+			add(route.Host)
+		}
+	}
+	return addrs
+}
+
+func hasDomainRoute(routes []config.Route) bool {
+	for _, route := range routes {
+		if isDomainRoute(route.Host) {
+			return true
+		}
+	}
+	return false
+}
+
+func canDialLocalPort(port string) bool {
+	conn, err := net.DialTimeout("tcp", net.JoinHostPort("127.0.0.1", port), 500*time.Millisecond)
+	if err != nil {
+		return false
+	}
+	_ = conn.Close()
+	return true
+}
+
+func portFromListenAddr(addr string) string {
+	addr = strings.TrimSpace(addr)
+	if strings.HasPrefix(addr, ":") {
+		return strings.TrimPrefix(addr, ":")
+	}
+	if _, port, err := net.SplitHostPort(addr); err == nil {
+		return port
+	}
+	return ""
 }

@@ -8,6 +8,7 @@ CONFIG_FILE="$CONFIG_DIR/Runtime"
 WEB_ROOT="${TERROR_WEB_ROOT:-/var/www/terrorserver}"
 WEB_INDEX="$WEB_ROOT/index.html"
 CERT_CACHE="${TERROR_CERT_CACHE:-/var/lib/terror/certs}"
+CERT_DIR="$(dirname "$CERT_CACHE")"
 SERVICE_FILE="/etc/systemd/system/terror.service"
 LISTEN_ADDR="${TERROR_ADDR:-:80}"
 REPO="${TERROR_REPO:-devlopersabbir/terrorserver}"
@@ -154,7 +155,7 @@ create_welcome_site() {
 create_cert_cache() {
   log_info "Creating certificate cache at $CERT_CACHE"
   mkdir -p "$CERT_CACHE"
-  chmod 700 "$(dirname "$CERT_CACHE")"
+  chmod 700 "$CERT_DIR"
   chmod 700 "$CERT_CACHE"
 }
 
@@ -180,7 +181,7 @@ Environment=TERROR_CERT_CACHE=$CERT_CACHE
 NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict
-ReadWritePaths=$CONFIG_DIR $CERT_CACHE
+ReadWritePaths=$CONFIG_DIR $CERT_DIR
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 
