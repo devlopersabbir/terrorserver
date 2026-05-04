@@ -66,4 +66,6 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           password: ${{ secrets.PASSWORD }}
-          script: "sudo systemctl reload caddy"
+          script: |
+            mv /var/www/docs/.vitepress/dist/* /var/www/docs
+            sudo systemctl restart caddy
