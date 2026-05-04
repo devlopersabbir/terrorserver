@@ -79,6 +79,7 @@ terror                  # Start the server (default)
 terror serve            # Start the server
 terror validate         # Validate config without starting
 terror status           # Show runtime status
+terror update           # Pull and install the latest stable release
 terror version          # Print version
 terror help             # Show help
 ```

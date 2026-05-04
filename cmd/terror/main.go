@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
+	"os/exec"
 	"os/signal"
 	"syscall"
 	"time"
@@ -16,6 +18,7 @@ import (
 const (
 	defaultConfigPath = "/etc/terror/Runtime"
 	defaultAddr       = ":80"
+	defaultInstallURL = "https://terror.softvenceomega.com/install.sh"
 )
 
 var version = "prod"
@@ -33,6 +36,8 @@ func main() {
 		runStatus()
 	case "validate", "v":
 		runValidate()
+	case "update", "upgrade", "u":
+		runUpdate()
 	case "version", "--version", "-v":
 		fmt.Printf("terror version %s\n", version)
 	case "help", "-h", "--help":
@@ -56,6 +61,13 @@ func listenAddr() string {
 		return a
 	}
 	return defaultAddr
+}
+
+func installURL() string {
+	if u := os.Getenv("TERROR_INSTALL_URL"); u != "" {
+		return u
+	}
+	return defaultInstallURL
 }
 
 func runServe() {
@@ -123,6 +135,59 @@ func runValidate() {
 	fmt.Println("✔ config is valid")
 }
 
+func runUpdate() {
+	url := installURL()
+	fmt.Println()
+	fmt.Println("  terrorserver update")
+	fmt.Println("  -------------------------------------")
+	fmt.Printf("  pulling latest stable release from %s\n", url)
+	fmt.Println()
+
+	args := []string{"-fsSL", url}
+	if os.Geteuid() == 0 {
+		if err := pipeCommand(exec.Command("curl", args...), exec.Command("bash")); err != nil {
+			fmt.Fprintf(os.Stderr, "update failed: %v\n", err)
+			os.Exit(1)
+		}
+		return
+	}
+
+	if _, err := exec.LookPath("sudo"); err != nil {
+		fmt.Fprintln(os.Stderr, "update failed: run 'sudo terror update' or install sudo")
+		os.Exit(1)
+	}
+	if err := pipeCommand(exec.Command("curl", args...), exec.Command("sudo", "bash")); err != nil {
+		fmt.Fprintf(os.Stderr, "update failed: %v\n", err)
+		os.Exit(1)
+	}
+}
+
+func pipeCommand(src, dst *exec.Cmd) error {
+	reader, writer := io.Pipe()
+	defer reader.Close()
+
+	src.Stdout = writer
+	src.Stderr = os.Stderr
+	dst.Stdin = reader
+	dst.Stdout = os.Stdout
+	dst.Stderr = os.Stderr
+
+	if err := dst.Start(); err != nil {
+		_ = writer.Close()
+		return err
+	}
+	if err := src.Run(); err != nil {
+		_ = writer.Close()
+		_ = dst.Wait()
+		return err
+	}
+	if err := writer.Close(); err != nil {
+		_ = dst.Wait()
+		return err
+	}
+	return dst.Wait()
+}
+
 func printHelp() {
 	fmt.Printf(`terrorserver %s — minimal domain router & reverse proxy
 
@@ -133,6 +198,7 @@ Commands:
   start, serve   > [s] Start the server (default)
   validate       > [v] Validate the config file without starting
   status         > [st, s] Show runtime status
+  update         > [u] Pull and install the latest stable release
   version        > [-v, --version] Print version
   help           > [-h, --help] Show this help
 
