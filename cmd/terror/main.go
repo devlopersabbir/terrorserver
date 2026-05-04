@@ -106,22 +106,7 @@ func runServe() {
 }
 
 func runStatus() {
-	// Connect to running instance via Unix socket or pid file in future.
-	// For now, report process + config existence.
-	cfgPath := configPath()
-
-	fmt.Println()
-	fmt.Println("  terrorserver status")
-	fmt.Println("  ─────────────────────────────────────")
-
-	if _, err := os.Stat(cfgPath); err == nil {
-		fmt.Printf("  ✔ Config file found:  %s\n", cfgPath)
-	} else {
-		fmt.Printf("  ✘ Config file missing: %s\n", cfgPath)
-	}
-	fmt.Println()
-	fmt.Println("  tip: run 'terror validate' to check config syntax")
-	fmt.Println()
+	printStatus(configPath(), listenAddr())
 }
 
 func runValidate() {
