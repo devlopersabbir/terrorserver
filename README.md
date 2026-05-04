@@ -1,4 +1,4 @@
-# terrorserver
+# Terror Server
 
 A minimal, production-grade domain-based router, reverse proxy, and static file server.
 
