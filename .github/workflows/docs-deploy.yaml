@@ -67,5 +67,5 @@ jobs:
           username: ${{ secrets.USER }}
           password: ${{ secrets.PASSWORD }}
           script: |
-            mv /var/www/docs/.vitepress/dist/* /var/www/docs
+            mv -f /var/www/docs/.vitepress/dist/* /var/www/docs
             sudo systemctl restart caddy
