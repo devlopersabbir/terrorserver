@@ -11,7 +11,7 @@ A minimal, production-grade domain-based router, reverse proxy, and static file 
 - **Domain-based routing** — route by hostname or port
 - **Reverse proxy** — transparent upstream forwarding
 - **Static file server** — with SPA fallback support
-- **Live reload** — edit config, changes apply instantly, zero downtime
+- **Runtime watcher** — installer restarts the service when config changes
 - **Single binary** — no runtime dependencies
 - **Systemd integration** — production-ready service management
 
@@ -42,7 +42,7 @@ The installer will:
 
 ## Config
 
-Edit `/etc/terror/Runtime`. Changes are detected and applied **instantly** — no restart needed.
+Edit `/etc/terror/Runtime`. The installer enables a systemd path watcher, so saved changes restart `terror.service` automatically.
 
 ```
 # Reverse proxy
@@ -85,15 +85,15 @@ terror help             # Show help
 
 ---
 
-## Live Reload
+## Runtime Reload
 
-terrorserver watches the config file with `fsnotify`. When a change is detected:
+When installed with `install.sh`, systemd watches `/etc/terror/Runtime`. When a change is saved:
 
-1. Config is re-parsed
-2. If valid → routing table is atomically swapped in memory
-3. If invalid → old config remains active, error is logged
+1. `terror.path` detects the file change
+2. `terror-restart.service` restarts `terror.service`
+3. New domains, ports, proxies, static roots, and SSL listeners are loaded
 
-**No connections are dropped. No restart happens.**
+This restart is intentional because adding or removing listeners such as `:9090` or `:443` requires rebinding ports.
 
 ---
 

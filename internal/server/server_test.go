@@ -81,6 +81,63 @@ func TestPortOnlyRouteMatchesHostWithoutPort(t *testing.T) {
 	}
 }
 
+func TestDomainHTTPRedirectsToHTTPS(t *testing.T) {
+	cfg := filepath.Join(t.TempDir(), "Runtime")
+	runtime := `
+example.com {
+    proxy localhost:4000
+}
+`
+	if err := os.WriteFile(cfg, []byte(runtime), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	s := New(cfg)
+	s.listenAddr = ":80"
+	if err := s.LoadConfig(); err != nil {
+		t.Fatal(err)
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "http://example.com/dashboard", nil)
+	rr := httptest.NewRecorder()
+
+	s.httpsRedirectHandler().ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusMovedPermanently {
+		t.Fatalf("expected HTTPS redirect, got %d", rr.Code)
+	}
+	if got := rr.Header().Get("Location"); got != "https://example.com/dashboard" {
+		t.Fatalf("expected HTTPS location, got %q", got)
+	}
+}
+
+func TestPortHTTPDoesNotRedirectToHTTPS(t *testing.T) {
+	cfg := filepath.Join(t.TempDir(), "Runtime")
+	runtime := `
+:9090 {
+    proxy localhost:4000
+}
+`
+	if err := os.WriteFile(cfg, []byte(runtime), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	s := New(cfg)
+	s.listenAddr = ":9090"
+	if err := s.LoadConfig(); err != nil {
+		t.Fatal(err)
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "http://127.0.0.1:9090/", nil)
+	rr := httptest.NewRecorder()
+
+	s.httpsRedirectHandler().ServeHTTP(rr, req)
+
+	if rr.Code == http.StatusMovedPermanently {
+		t.Fatal("did not expect port route to redirect to HTTPS")
+	}
+}
+
 func TestListenAddrsIncludesPortRoutes(t *testing.T) {
 	got := listenAddrs(":80", []config.Route{
 		{Host: ":9090", Type: config.RouteProxy, Target: "localhost:4000"},
