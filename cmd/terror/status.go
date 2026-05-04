@@ -1,8 +1,10 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net"
+	"net/http"
 	"os"
 	"os/exec"
 	"strings"
@@ -68,16 +70,43 @@ func printServiceStatus() {
 func printTLSStatus(routes []config.Route) {
 	for _, route := range routes {
 		if isDomainRoute(route.Host) {
+			host := hostOnly(route.Host)
 			if autoTLSDisabled() {
 				fmt.Println("  warn ssl: automatic SSL disabled by TERROR_AUTO_TLS")
 			} else if canDialLocalPort("443") {
 				fmt.Println("  ok ssl: automatic Let's Encrypt SSL enabled")
+				fmt.Println("  ok ssl: domain HTTP redirects to HTTPS")
+				printHTTPSProbe(host)
 			} else {
 				fmt.Println("  warn ssl: expected :443 listener is not reachable locally")
 			}
 			return
 		}
 	}
+}
+
+func printHTTPSProbe(host string) {
+	dialer := &net.Dialer{Timeout: 2 * time.Second}
+	transport := &http.Transport{
+		DialContext: dialer.DialContext,
+		TLSClientConfig: &tls.Config{
+			ServerName: host,
+			MinVersion: tls.VersionTLS12,
+		},
+	}
+	defer transport.CloseIdleConnections()
+
+	client := &http.Client{
+		Timeout:   3 * time.Second,
+		Transport: transport,
+	}
+	resp, err := client.Head("https://" + host + "/")
+	if err != nil {
+		fmt.Printf("  warn ssl: HTTPS probe failed for %s (%v)\n", host, err)
+		return
+	}
+	_ = resp.Body.Close()
+	fmt.Printf("  ok ssl: HTTPS probe returned %s\n", resp.Status)
 }
 
 func printListenerStatus(addrs []string) {
