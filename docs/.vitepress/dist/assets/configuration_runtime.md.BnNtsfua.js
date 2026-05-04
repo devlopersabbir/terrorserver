@@ -1,0 +1,38 @@
+import{_ as a,o as e,c as n,ak as i}from"./chunks/framework.DvrM7GBU.js";const u=JSON.parse('{"title":"Runtime File","description":"","frontmatter":{},"headers":[],"relativePath":"configuration/runtime.md","filePath":"configuration/runtime.md","lastUpdated":0}'),t={name:"configuration/runtime.md"};function l(p,s,r,o,c,d){return e(),n("div",null,[...s[0]||(s[0]=[i(`<h1 id="runtime-file" tabindex="-1">Runtime File <a class="header-anchor" href="#runtime-file" aria-label="Permalink to “Runtime File”">​</a></h1><p>The Runtime file is the routing source of truth. It uses compact blocks where the block label is either a domain name or a port listener.</p><div class="language-txt"><button title="Copy Code" class="copy"></button><span class="lang">txt</span><pre class="shiki shiki-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e;" tabindex="0" dir="ltr"><code><span class="line"><span>:80 {</span></span>
+<span class="line"><span>    root /var/www/terrorserver</span></span>
+<span class="line"><span>    file_server</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>app.example.com {</span></span>
+<span class="line"><span>    proxy localhost:4000</span></span>
+<span class="line"><span>}</span></span></code></pre></div><h2 id="block-shape" tabindex="-1">Block Shape <a class="header-anchor" href="#block-shape" aria-label="Permalink to “Block Shape”">​</a></h2><div class="language-txt"><button title="Copy Code" class="copy"></button><span class="lang">txt</span><pre class="shiki shiki-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e;" tabindex="0" dir="ltr"><code><span class="line"><span>address {</span></span>
+<span class="line"><span>    directive value</span></span>
+<span class="line"><span>    handler</span></span>
+<span class="line"><span>}</span></span></code></pre></div><table tabindex="0"><thead><tr><th>Part</th><th>Meaning</th></tr></thead><tbody><tr><td><code>address</code></td><td>A domain such as <code>app.example.com</code> or a port such as <code>:9090</code></td></tr><tr><td><code>proxy</code></td><td>Reverse proxy handler with an upstream address</td></tr><tr><td><code>root</code></td><td>Static file root used by <code>file_server</code></td></tr><tr><td><code>file_server</code></td><td>Static file handler</td></tr></tbody></table><h2 id="rules" tabindex="-1">Rules <a class="header-anchor" href="#rules" aria-label="Permalink to “Rules”">​</a></h2><ul><li>One block per domain or port.</li><li>A block can use <code>proxy</code> or <code>file_server</code>, not both.</li><li><code>file_server</code> requires a <code>root</code> directive.</li><li><code>proxy</code> requires an upstream address.</li><li>Comments start with <code>#</code>.</li><li>Unknown directives fail validation.</li><li>Domains are matched case-insensitively.</li></ul><p>Run validation before production edits:</p><div class="language-bash"><button title="Copy Code" class="copy"></button><span class="lang">bash</span><pre class="shiki shiki-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e;" tabindex="0" dir="ltr"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">terror</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> validate</span></span></code></pre></div><h2 id="domain-routes" tabindex="-1">Domain Routes <a class="header-anchor" href="#domain-routes" aria-label="Permalink to “Domain Routes”">​</a></h2><p>Domain routes match by hostname.</p><div class="language-txt"><button title="Copy Code" class="copy"></button><span class="lang">txt</span><pre class="shiki shiki-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e;" tabindex="0" dir="ltr"><code><span class="line"><span>api.example.com {</span></span>
+<span class="line"><span>    proxy localhost:3000</span></span>
+<span class="line"><span>}</span></span></code></pre></div><p>For domain routes, automatic Let&#39;s Encrypt TLS is enabled by default unless disabled with <code>TERROR_AUTO_TLS=false</code>.</p><h2 id="port-routes" tabindex="-1">Port Routes <a class="header-anchor" href="#port-routes" aria-label="Permalink to “Port Routes”">​</a></h2><p>Port routes match requests received on that listener.</p><div class="language-txt"><button title="Copy Code" class="copy"></button><span class="lang">txt</span><pre class="shiki shiki-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e;" tabindex="0" dir="ltr"><code><span class="line"><span>:9090 {</span></span>
+<span class="line"><span>    proxy localhost:4000</span></span>
+<span class="line"><span>}</span></span></code></pre></div><p>Port routes stay on HTTP. They are useful for internal tools, private listeners, or apps that are exposed through another upstream layer.</p><h2 id="static-routes" tabindex="-1">Static Routes <a class="header-anchor" href="#static-routes" aria-label="Permalink to “Static Routes”">​</a></h2><div class="language-txt"><button title="Copy Code" class="copy"></button><span class="lang">txt</span><pre class="shiki shiki-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e;" tabindex="0" dir="ltr"><code><span class="line"><span>static.example.com {</span></span>
+<span class="line"><span>    root /var/www/html</span></span>
+<span class="line"><span>    file_server</span></span>
+<span class="line"><span>}</span></span></code></pre></div><p>When a requested static path does not exist, Terror Server falls back to <code>/</code>. This keeps frontend apps with client-side routing working cleanly.</p><h2 id="complete-example" tabindex="-1">Complete Example <a class="header-anchor" href="#complete-example" aria-label="Permalink to “Complete Example”">​</a></h2><div class="language-txt"><button title="Copy Code" class="copy"></button><span class="lang">txt</span><pre class="shiki shiki-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e;" tabindex="0" dir="ltr"><code><span class="line"><span># Default welcome site</span></span>
+<span class="line"><span>:80 {</span></span>
+<span class="line"><span>    root /var/www/terrorserver</span></span>
+<span class="line"><span>    file_server</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span># Public app over automatic HTTPS</span></span>
+<span class="line"><span>app.example.com {</span></span>
+<span class="line"><span>    proxy localhost:4000</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span># Internal HTTP listener</span></span>
+<span class="line"><span>:9090 {</span></span>
+<span class="line"><span>    proxy localhost:4000</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span># Static site</span></span>
+<span class="line"><span>static.example.com {</span></span>
+<span class="line"><span>    root /var/www/html</span></span>
+<span class="line"><span>    file_server</span></span>
+<span class="line"><span>}</span></span></code></pre></div>`,23)])])}const k=a(t,[["render",l]]);export{u as __pageData,k as default};

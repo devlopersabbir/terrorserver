@@ -1,0 +1,12 @@
+import{_ as e,o,c as a,ak as i}from"./chunks/framework.DvrM7GBU.js";const q=JSON.parse('{"title":"","description":"","frontmatter":{"layout":"home","hero":{"name":"Terror Server","text":"Route Servers Without The Sprawl","tagline":"A free, open-source, cross-platform gateway. Define domains, reverse proxies, and automatic TLS in one readable Runtime file.","image":{"src":"/logo.svg"},"actions":[{"theme":"brand","text":"Get Started","link":"/getting-started/"},{"theme":"alt","text":"View on GitHub","link":"https://github.com/devlopersabbir/terrorserver"}]},"features":[{"title":"Reverse Proxy","details":"Effortlessly route traffic to your backend applications using a simple, readable configuration.","icon":"⚡️"},{"title":"Automatic TLS","details":"Secure by default. Automatically provisions and manages SSL certificates for all your domains.","icon":"🔒"},{"title":"Static File Server","details":"High-performance static asset delivery with zero configuration overhead.","icon":"📁"}]},"headers":[],"relativePath":"index.md","filePath":"index.md","lastUpdated":0}'),r={name:"index.md"};function s(l,t,n,c,u,d){return o(),a("div",null,[...t[0]||(t[0]=[i(`<div class="bottom-cta"><div class="cta-content"><div class="cta-badge">Zero Dependencies</div><h2 class="cta-title">Ready to route?</h2><p class="cta-desc">Install Terror globally in seconds and start proxying your apps.</p><pre><code>&lt;div class=&quot;install-block&quot;&gt;
+  &lt;div class=&quot;install-icon&quot;&gt;
+    &lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;20&quot; height=&quot;20&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;&gt;&lt;polyline points=&quot;4 17 10 11 4 5&quot;&gt;&lt;/polyline&gt;&lt;line x1=&quot;12&quot; y1=&quot;19&quot; x2=&quot;20&quot; y2=&quot;19&quot;&gt;&lt;/line&gt;&lt;/svg&gt;
+  &lt;/div&gt;
+  &lt;code&gt;curl -sSL https://raw.githubusercontent.com/devlopersabbir/terrorserver/main/install.sh | bash&lt;/code&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;cta-links&quot;&gt;
+  &lt;a href=&quot;/getting-started/&quot; class=&quot;cta-link primary&quot;&gt;Read the Docs&lt;/a&gt;
+  &lt;a href=&quot;/reference/cli&quot; class=&quot;cta-link secondary&quot;&gt;View CLI Commands&lt;/a&gt;
+&lt;/div&gt;
+</code></pre></div><div class="cta-bg-glow"></div></div>`,1)])])}const p=e(r,[["render",s]]);export{q as __pageData,p as default};
