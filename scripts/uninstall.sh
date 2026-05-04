@@ -9,6 +9,7 @@ INSTALL_PATH="/usr/local/bin/terror"
 CONFIG_DIR="/etc/terror"
 CONFIG_FILE="$CONFIG_DIR/Runtime"
 WEB_ROOT="${TERROR_WEB_ROOT:-/var/www/terrorserver}"
+CERT_CACHE="${TERROR_CERT_CACHE:-/var/lib/terror/certs}"
 SERVICE_FILE="/etc/systemd/system/terror.service"
 SERVICE_NAME="terror"
 AUTHOR_NAME="Sabbir Hossain Shuvo"
@@ -54,7 +55,8 @@ confirm() {
   echo -e "  ${WHITE}${BOLD}TARGETS${NC}"
   echo -e "  ${GRAY}├─${NC} ${BOLD}Binary:${NC}   ${GRAY}${INSTALL_PATH}${NC}"
   echo -e "  ${GRAY}├─${NC} ${BOLD}Config:${NC}   ${GRAY}${CONFIG_FILE}${NC}"
-  echo -e "  ${GRAY}└─${NC} ${BOLD}Web Root:${NC} ${GRAY}${WEB_ROOT}${NC}"
+  echo -e "  ${GRAY}├─${NC} ${BOLD}Web Root:${NC} ${GRAY}${WEB_ROOT}${NC}"
+  echo -e "  ${GRAY}└─${NC} ${BOLD}Certs:${NC}    ${GRAY}${CERT_CACHE}${NC}"
   echo -e ""
   
   # Read from /dev/tty to avoid consuming the script when piped from curl
@@ -162,6 +164,32 @@ remove_welcome_site() {
   fi
 }
 
+remove_cert_cache() {
+  local cert_root
+  cert_root="$(dirname "$CERT_CACHE")"
+
+  if [[ -d "$cert_root" ]]; then
+    local answer
+    if [[ "$FORCE_YES" == "true" ]]; then
+      answer="y"
+    else
+      read -rp "Remove certificate cache directory $cert_root? [y/N] " answer < /dev/tty || answer="n"
+    fi
+
+    case "$answer" in
+      [yY][eE][sS]|[yY])
+        log_info "Removing certificate cache: $cert_root"
+        rm -rf "$cert_root"
+        ;;
+      *)
+        log_warn "Keeping certificate cache at $cert_root"
+        ;;
+    esac
+  else
+    log_warn "Certificate cache not found at $cert_root — skipping"
+  fi
+}
+
 print_done() {
   local CYAN='\033[0;36m'
   local GRAY='\033[0;90m'
@@ -176,7 +204,8 @@ print_done() {
   echo -e "  ${GRAY}├─${NC} ${BOLD}Service:${NC}  ${CYAN}${SERVICE_NAME}${NC} stopped and disabled"
   echo -e "  ${GRAY}├─${NC} ${BOLD}Binary:${NC}   ${GRAY}${INSTALL_PATH}${NC}"
   echo -e "  ${GRAY}├─${NC} ${BOLD}Config:${NC}   ${GRAY}${CONFIG_DIR}${NC}"
-  echo -e "  ${GRAY}└─${NC} ${BOLD}Web Root:${NC} ${GRAY}${WEB_ROOT}${NC}"
+  echo -e "  ${GRAY}├─${NC} ${BOLD}Web Root:${NC} ${GRAY}${WEB_ROOT}${NC}"
+  echo -e "  ${GRAY}└─${NC} ${BOLD}Certs:${NC}    ${GRAY}${CERT_CACHE}${NC}"
   echo -e ""
   echo -e "  ${WHITE}${BOLD}MAINTAINER${NC}"
   echo -e "  ${GRAY}By${NC} ${AUTHOR_NAME} ${GRAY}(${AUTHOR_URL})${NC}"
@@ -198,6 +227,7 @@ main() {
   remove_binary
   remove_config
   remove_welcome_site
+  remove_cert_cache
   print_done
 }
 

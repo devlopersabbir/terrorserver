@@ -67,7 +67,11 @@ func printServiceStatus() {
 func printTLSStatus(routes []config.Route) {
 	for _, route := range routes {
 		if isDomainRoute(route.Host) {
-			fmt.Println("  warn ssl: automatic SSL is not enabled yet")
+			if autoTLSDisabled() {
+				fmt.Println("  warn ssl: automatic SSL disabled by TERROR_AUTO_TLS")
+			} else {
+				fmt.Println("  ok ssl: automatic Let's Encrypt SSL enabled")
+			}
 			return
 		}
 	}
@@ -154,4 +158,9 @@ func hostOnly(host string) string {
 		return h
 	}
 	return host
+}
+
+func autoTLSDisabled() bool {
+	v := strings.ToLower(strings.TrimSpace(os.Getenv("TERROR_AUTO_TLS")))
+	return v == "0" || v == "false" || v == "no"
 }

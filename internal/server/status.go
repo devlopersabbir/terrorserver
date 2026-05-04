@@ -17,7 +17,7 @@ type Status struct {
 func (s *Server) Status() Status {
 	tbl := s.table()
 	return Status{
-		Running:     s.httpServer != nil,
+		Running:     len(s.httpServers) > 0,
 		Uptime:      time.Since(s.startedAt),
 		RouteCount:  tbl.Len(),
 		ConfigLoads: atomic.LoadInt64(&s.configLoads),

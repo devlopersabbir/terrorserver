@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/devlopersabbir/terrorserver/internal/config"
 )
 
 func TestWelcomePageOnPort80(t *testing.T) {
@@ -50,12 +52,13 @@ func TestPortOnlyRouteMatchesHostWithoutPort(t *testing.T) {
 	}
 
 	cfg := filepath.Join(t.TempDir(), "Runtime")
-	if err := os.WriteFile(cfg, []byte(`
+	runtime := `
 :80 {
-    root `+root+`
+    root ` + root + `
     file_server
 }
-`), 0o644); err != nil {
+`
+	if err := os.WriteFile(cfg, []byte(runtime), 0o644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -75,5 +78,49 @@ func TestPortOnlyRouteMatchesHostWithoutPort(t *testing.T) {
 	}
 	if strings.TrimSpace(rr.Body.String()) != "static welcome" {
 		t.Fatalf("expected static welcome page, got %q", rr.Body.String())
+	}
+}
+
+func TestListenAddrsIncludesPortRoutes(t *testing.T) {
+	got := listenAddrs(":80", []config.Route{
+		{Host: ":9090", Type: config.RouteProxy, Target: "localhost:4000"},
+		{Host: "example.com", Type: config.RouteProxy, Target: "localhost:4000"},
+	}, false)
+
+	want := map[string]bool{":80": true, ":9090": true}
+	if len(got) != len(want) {
+		t.Fatalf("expected %d listen addrs, got %v", len(want), got)
+	}
+	for _, addr := range got {
+		if !want[addr] {
+			t.Fatalf("unexpected listen addr %q in %v", addr, got)
+		}
+	}
+}
+
+func TestListenAddrsIncludesPort80ForACME(t *testing.T) {
+	got := listenAddrs(":8080", nil, true)
+	want := map[string]bool{":80": true, ":8080": true}
+
+	if len(got) != len(want) {
+		t.Fatalf("expected %d listen addrs, got %v", len(want), got)
+	}
+	for _, addr := range got {
+		if !want[addr] {
+			t.Fatalf("unexpected listen addr %q in %v", addr, got)
+		}
+	}
+}
+
+func TestDomainRoutesFiltersPortAndIPRoutes(t *testing.T) {
+	got := domainRoutes([]config.Route{
+		{Host: ":9090"},
+		{Host: "127.0.0.1"},
+		{Host: "example.com"},
+		{Host: "example.com:80"},
+	})
+
+	if len(got) != 1 || got[0] != "example.com" {
+		t.Fatalf("expected only example.com, got %v", got)
 	}
 }

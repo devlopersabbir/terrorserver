@@ -2,9 +2,13 @@ package server
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
+	"os"
+	"sort"
+	"strings"
 	"sync/atomic"
 	"time"
 
@@ -14,16 +18,17 @@ import (
 	"github.com/devlopersabbir/terrorserver/internal/server/handler"
 	"github.com/devlopersabbir/terrorserver/internal/server/response"
 	"github.com/devlopersabbir/terrorserver/internal/server/router"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 // Server is the core terrorserver HTTP engine.
 type Server struct {
-	configPath string
-	listenAddr string
-	tablePtr   atomic.Pointer[router.Table]
-	proxyPool  *proxy.Pool
-	httpServer *http.Server
-	listener   net.Listener
+	configPath  string
+	listenAddr  string
+	tablePtr    atomic.Pointer[router.Table]
+	proxyPool   *proxy.Pool
+	httpServers []*http.Server
+	listeners   []net.Listener
 
 	// status fields
 	startedAt   time.Time
@@ -70,33 +75,47 @@ func (s *Server) Start(addr string) error {
 	s.startedAt = time.Now()
 	s.listenAddr = addr
 
-	ln, err := net.Listen("tcp", addr)
+	cfg, err := config.Parse(s.configPath)
 	if err != nil {
-		return fmt.Errorf("cannot bind %s: %w", addr, err)
-	}
-	s.listener = ln
-
-	mux := http.NewServeMux()
-	mux.Handle("/", s)
-
-	s.httpServer = &http.Server{
-		Handler:      mux,
-		ReadTimeout:  30 * time.Second,
-		WriteTimeout: 60 * time.Second,
-		IdleTimeout:  120 * time.Second,
+		return fmt.Errorf("cannot read listener config: %w", err)
 	}
 
-	logger.Info("listening on %s", addr)
-	go s.httpServer.Serve(ln)
+	domains := domainRoutes(cfg.Routes)
+	httpHandler := http.Handler(s)
+	if len(domains) > 0 && autoTLSDisabled() {
+		logger.Warn("automatic SSL disabled by TERROR_AUTO_TLS=false")
+	} else if len(domains) > 0 {
+		manager := &autocert.Manager{
+			Prompt:     autocert.AcceptTOS,
+			Cache:      autocert.DirCache(certCacheDir()),
+			HostPolicy: autocert.HostWhitelist(domains...),
+		}
+		httpHandler = manager.HTTPHandler(s)
+		if err := s.startListener(":443", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			s.ServeHTTP(w, r)
+		}), &tls.Config{GetCertificate: manager.GetCertificate, MinVersion: tls.VersionTLS12}); err != nil {
+			return err
+		}
+		logger.Info("automatic SSL enabled for: %s", strings.Join(domains, ", "))
+	}
+
+	for _, listen := range listenAddrs(addr, cfg.Routes, len(domains) > 0 && !autoTLSDisabled()) {
+		if err := s.startListener(listen, httpHandler, nil); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
 // Shutdown gracefully stops the HTTP server.
 func (s *Server) Shutdown(ctx context.Context) error {
-	if s.httpServer == nil {
-		return nil
+	var err error
+	for _, srv := range s.httpServers {
+		if shutdownErr := srv.Shutdown(ctx); shutdownErr != nil && err == nil {
+			err = shutdownErr
+		}
 	}
-	return s.httpServer.Shutdown(ctx)
+	return err
 }
 
 // ServeHTTP is the main request dispatcher.
@@ -107,10 +126,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	route, ok := router.Lookup(s.table(), router.RequestContext{
 		Host:         r.Host,
 		ListenAddr:   s.listenAddr,
-		ListenerAddr: s.listenerAddr(),
+		ListenerAddr: listenerAddr(r),
 	})
 	if !ok {
-		if router.IsPort80(s.listenAddr, s.listenerAddr(), r.Host) {
+		if router.IsPort80(s.listenAddr, listenerAddr(r), r.Host) {
 			handler.Welcome(rw)
 			logger.Request(r.Method, r.Host, r.URL.Path, rw.Code, time.Since(start))
 			return
@@ -139,9 +158,98 @@ func (s *Server) table() *router.Table {
 	return router.NewTable(nil)
 }
 
-func (s *Server) listenerAddr() string {
-	if s.listener == nil {
-		return ""
+func (s *Server) startListener(addr string, h http.Handler, tlsConfig *tls.Config) error {
+	ln, err := net.Listen("tcp", addr)
+	if err != nil {
+		return fmt.Errorf("cannot bind %s: %w", addr, err)
 	}
-	return s.listener.Addr().String()
+
+	srv := &http.Server{
+		Handler:      h,
+		ReadTimeout:  30 * time.Second,
+		WriteTimeout: 60 * time.Second,
+		IdleTimeout:  120 * time.Second,
+		TLSConfig:    tlsConfig,
+	}
+
+	s.listeners = append(s.listeners, ln)
+	s.httpServers = append(s.httpServers, srv)
+
+	logger.Info("listening on %s", addr)
+	go func() {
+		var serveErr error
+		if tlsConfig != nil {
+			serveErr = srv.ServeTLS(ln, "", "")
+		} else {
+			serveErr = srv.Serve(ln)
+		}
+		if serveErr != nil && serveErr != http.ErrServerClosed {
+			logger.Error("listener %s stopped: %v", addr, serveErr)
+		}
+	}()
+	return nil
+}
+
+func listenerAddr(r *http.Request) string {
+	if addr, ok := r.Context().Value(http.LocalAddrContextKey).(net.Addr); ok && addr != nil {
+		return addr.String()
+	}
+	return ""
+}
+
+func listenAddrs(defaultAddr string, routes []config.Route, needsACMEHTTP bool) []string {
+	seen := map[string]bool{}
+	addrs := []string{}
+	add := func(addr string) {
+		if addr == "" || seen[addr] {
+			return
+		}
+		seen[addr] = true
+		addrs = append(addrs, addr)
+	}
+
+	add(defaultAddr)
+	if needsACMEHTTP {
+		add(":80")
+	}
+	for _, route := range routes {
+		if strings.HasPrefix(route.Host, ":") {
+			add(route.Host)
+		}
+	}
+	sort.Strings(addrs)
+	return addrs
+}
+
+func domainRoutes(routes []config.Route) []string {
+	seen := map[string]bool{}
+	var domains []string
+	for _, route := range routes {
+		host := strings.ToLower(strings.TrimSpace(route.Host))
+		if host == "" || strings.HasPrefix(host, ":") {
+			continue
+		}
+		if h, _, err := net.SplitHostPort(host); err == nil {
+			host = h
+		}
+		if net.ParseIP(host) != nil || seen[host] {
+			continue
+		}
+		seen[host] = true
+		domains = append(domains, host)
+	}
+	sort.Strings(domains)
+	return domains
+}
+
+func certCacheDir() string {
+	if dir := os.Getenv("TERROR_CERT_CACHE"); dir != "" {
+		return dir
+	}
+	return "/var/lib/terror/certs"
+}
+
+func autoTLSDisabled() bool {
+	v := strings.ToLower(strings.TrimSpace(os.Getenv("TERROR_AUTO_TLS")))
+	return v == "0" || v == "false" || v == "no"
 }

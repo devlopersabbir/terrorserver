@@ -7,6 +7,7 @@ CONFIG_DIR="/etc/terror"
 CONFIG_FILE="$CONFIG_DIR/Runtime"
 WEB_ROOT="${TERROR_WEB_ROOT:-/var/www/terrorserver}"
 WEB_INDEX="$WEB_ROOT/index.html"
+CERT_CACHE="${TERROR_CERT_CACHE:-/var/lib/terror/certs}"
 SERVICE_FILE="/etc/systemd/system/terror.service"
 LISTEN_ADDR="${TERROR_ADDR:-:80}"
 REPO="${TERROR_REPO:-devlopersabbir/terrorserver}"
@@ -150,6 +151,13 @@ create_welcome_site() {
   chmod 644 "$WEB_INDEX"
 }
 
+create_cert_cache() {
+  log_info "Creating certificate cache at $CERT_CACHE"
+  mkdir -p "$CERT_CACHE"
+  chmod 700 "$(dirname "$CERT_CACHE")"
+  chmod 700 "$CERT_CACHE"
+}
+
 install_service() {
   log_info "Creating systemd service at $SERVICE_FILE"
   cat > "$SERVICE_FILE" <<EOF
@@ -166,12 +174,13 @@ Restart=always
 RestartSec=3
 Environment=TERROR_CONFIG=$CONFIG_FILE
 Environment=TERROR_ADDR=$LISTEN_ADDR
+Environment=TERROR_CERT_CACHE=$CERT_CACHE
 
 # Security hardening
 NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict
-ReadWritePaths=$CONFIG_DIR
+ReadWritePaths=$CONFIG_DIR $CERT_CACHE
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 
@@ -223,6 +232,7 @@ main() {
   download_binary
   install_binary
   create_welcome_site
+  create_cert_cache
   create_config
   install_service
   print_success
