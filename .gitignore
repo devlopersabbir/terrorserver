@@ -15,3 +15,5 @@ caddy-dist
 # IDE files
 .idea/
 .vscode/
+
+docs/node_modules/
