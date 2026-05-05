@@ -6,7 +6,7 @@
 #  Docs:      https://terror.softvenceomega.com/docs
 #  Repo:      https://github.com/devlopersabbir/terrorserver
 #
-#  Changes to this file are hot-reloaded automatically.
+#  Installed systems restart terror automatically after this file changes.
 # -----------------------------------------------------------------------------
 
 {{LISTEN_ADDR}} {

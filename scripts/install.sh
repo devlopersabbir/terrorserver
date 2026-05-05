@@ -210,6 +210,7 @@ Description=Watch terror Runtime config
 
 [Path]
 PathChanged=$CONFIG_FILE
+PathModified=$CONFIG_FILE
 Unit=terror-restart.service
 
 [Install]

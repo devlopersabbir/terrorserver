@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -48,9 +49,14 @@ func (p *Pool) Get(target string) (*httputil.ReverseProxy, error) {
 	// Preserve original Host header by default (pass-through mode)
 	origDirector := rp.Director
 	rp.Director = func(req *http.Request) {
+		originalHost := req.Host
+		originalRemoteAddr := req.RemoteAddr
 		origDirector(req)
-		req.Header.Set("X-Forwarded-Host", req.Host)
-		req.Header.Set("X-Real-IP", realIP(req))
+		req.Host = originalHost
+		req.Header.Set("X-Forwarded-Host", originalHost)
+		req.Header.Set("X-Forwarded-Proto", forwardedProto(req))
+		req.Header.Set("X-Forwarded-Port", forwardedPort(req, originalHost))
+		req.Header.Set("X-Real-IP", realIP(req, originalRemoteAddr))
 		if _, ok := req.Header["User-Agent"]; !ok {
 			req.Header.Set("User-Agent", "")
 		}
@@ -70,12 +76,37 @@ func (p *Pool) Flush() {
 	p.mu.Unlock()
 }
 
-func realIP(r *http.Request) string {
+func forwardedProto(r *http.Request) string {
+	if r.TLS != nil {
+		return "https"
+	}
+	return "http"
+}
+
+func forwardedPort(r *http.Request, host string) string {
+	if _, port, err := net.SplitHostPort(host); err == nil {
+		return port
+	}
+	if r.TLS != nil {
+		return "443"
+	}
+	return "80"
+}
+
+func realIP(r *http.Request, remoteAddr string) string {
 	if ip := r.Header.Get("X-Forwarded-For"); ip != "" {
 		return strings.Split(ip, ",")[0]
 	}
 	if ip := r.Header.Get("X-Real-IP"); ip != "" {
 		return ip
 	}
-	return r.RemoteAddr
+	return clientIP(remoteAddr)
+}
+
+func clientIP(remoteAddr string) string {
+	host, _, err := net.SplitHostPort(remoteAddr)
+	if err == nil {
+		return host
+	}
+	return remoteAddr
 }

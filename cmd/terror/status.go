@@ -37,6 +37,7 @@ func printStatus(cfgPath, addr string) {
 	fmt.Printf("  ok listen: %s\n", addr)
 	fmt.Printf("  ok routes: %d configured\n", len(cfg.Routes))
 	printServiceStatus()
+	printRuntimeWatcherStatus()
 	printListenerStatus(expectedListenAddrs(addr, cfg.Routes))
 	printTLSStatus(cfg.Routes)
 
@@ -65,6 +66,17 @@ func printServiceStatus() {
 		return
 	}
 	fmt.Println("  ok service: terror is active")
+}
+
+func printRuntimeWatcherStatus() {
+	if _, err := exec.LookPath("systemctl"); err != nil {
+		return
+	}
+	if err := exec.Command("systemctl", "is-active", "--quiet", "terror.path").Run(); err != nil {
+		fmt.Println("  warn watcher: terror.path is not active; Runtime changes may need manual restart")
+		return
+	}
+	fmt.Println("  ok watcher: terror.path is active")
 }
 
 func printTLSStatus(routes []config.Route) {

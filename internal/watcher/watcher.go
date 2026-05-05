@@ -1,8 +1,11 @@
 package watcher
 
 import (
-	"github.com/fsnotify/fsnotify"
+	"path/filepath"
+	"time"
+
 	"github.com/devlopersabbir/terrorserver/internal/logger"
+	"github.com/fsnotify/fsnotify"
 )
 
 // Watch monitors a file path for changes and calls onChange whenever it is
@@ -13,13 +16,16 @@ func Watch(path string, done <-chan struct{}, onChange func()) error {
 		return err
 	}
 
-	if err := w.Add(path); err != nil {
+	dir := filepath.Dir(path)
+	name := filepath.Clean(path)
+	if err := w.Add(dir); err != nil {
 		w.Close()
 		return err
 	}
 
 	go func() {
 		defer w.Close()
+		var lastReload time.Time
 		for {
 			select {
 			case <-done:
@@ -29,7 +35,14 @@ func Watch(path string, done <-chan struct{}, onChange func()) error {
 				if !ok {
 					return
 				}
-				if event.Has(fsnotify.Write) || event.Has(fsnotify.Create) {
+				if filepath.Clean(event.Name) != name {
+					continue
+				}
+				if event.Has(fsnotify.Write) || event.Has(fsnotify.Create) || event.Has(fsnotify.Rename) || event.Has(fsnotify.Chmod) {
+					if time.Since(lastReload) < 250*time.Millisecond {
+						continue
+					}
+					lastReload = time.Now()
 					logger.Info("config changed (%s), reloading...", event.Name)
 					onChange()
 				}

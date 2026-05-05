@@ -9,6 +9,7 @@ It is designed for simple Linux servers where you want Caddy-like ergonomics wit
 - Domain-based routing by hostname.
 - Port-based routing such as `:9090`.
 - Reverse proxy support for local upstream apps.
+- Jenkins-friendly `X-Forwarded-*` proxy headers.
 - Static file serving with index fallback for single-page apps.
 - Automatic Let's Encrypt certificates for domain routes.
 - Optional HTTP to HTTPS redirects for domain routes.
@@ -204,6 +205,7 @@ ok config: /etc/terror/Runtime
 ok listen: :80
 ok routes: 3 configured
 ok service: terror is active
+ok watcher: terror.path is active
 ok listener: :80 is accepting local connections
 ok listener: :443 is accepting local connections
 ok ssl: automatic Let's Encrypt SSL enabled
@@ -216,7 +218,7 @@ ok app.example.com -> proxy localhost:4000 (upstream reachable)
 ok :9090 -> proxy localhost:4000 (upstream reachable)
 ```
 
-Use it after every Runtime change. It is intentionally practical: it checks the config file, systemd service, expected listeners, DNS resolution, static roots, proxy upstream reachability, and HTTPS availability.
+Use it after every Runtime change. It is intentionally practical: it checks the config file, systemd service, Runtime watcher, expected listeners, DNS resolution, static roots, proxy upstream reachability, and HTTPS availability.
 
 ## Updates
 
@@ -324,6 +326,39 @@ terror status
 ```
 
 Adding or removing listener ports requires a process restart because ports must be rebound. The installer configures this restart automatically through `terror.path`.
+
+If `terror status` shows `warn watcher`, reinstall or update so the latest systemd watcher files are written:
+
+```bash
+terror update
+sudo systemctl status terror.path
+```
+
+### Jenkins says reverse proxy setup is broken
+
+Jenkins expects reverse proxies to pass the original request information. Terror Server sends:
+
+- `Host`
+- `X-Forwarded-Host`
+- `X-Forwarded-Proto`
+- `X-Forwarded-Port`
+- `X-Forwarded-For`
+- `X-Real-IP`
+
+Use a normal domain route:
+
+```txt
+jenkins.example.com {
+    proxy localhost:8080
+}
+```
+
+Then check:
+
+```bash
+curl -H "Host: jenkins.example.com" http://127.0.0.1/login
+terror status
+```
 
 ### Upstream is unreachable
 

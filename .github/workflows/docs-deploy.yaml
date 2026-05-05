@@ -67,5 +67,5 @@ jobs:
           username: ${{ secrets.USER }}
           password: ${{ secrets.PASSWORD }}
           script: |
-            mv -f /var/www/docs/.vitepress/dist/* /var/www/docs
-            sudo systemctl restart caddy
+            mv -f /var/www/docs/.vitepress/dist/* /var/www/terrorserver/docs 
+            sudo systemctl restart terror
