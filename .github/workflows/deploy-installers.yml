@@ -43,13 +43,23 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Copy installer assets with SCP
+      - name: Copy installer assets
         if: ${{ steps.changes.outputs.changed == 'true' }}
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           password: ${{ secrets.PASSWORD }}
-          source: "scripts/install.sh,scripts/uninstall.sh,templates/welcome.html,templates/Runtime"
+          source: "scripts/install.sh,scripts/uninstall.sh"
+          target: "/var/www/resource/terrorserver"
+          strip_components: 1
+      - name: Copy welcome page
+        if: ${{ steps.changes.outputs.changed == 'true' }}
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          password: ${{ secrets.PASSWORD }}
+          source: "templates/welcome.html"
           target: "/var/www/terrorserver"
           strip_components: 1

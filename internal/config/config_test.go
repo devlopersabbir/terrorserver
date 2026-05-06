@@ -65,6 +65,32 @@ app.example.com {
 	if r.Root != "/var/www/html" {
 		t.Errorf("wrong root: %s", r.Root)
 	}
+	if r.Fallback != "" {
+		t.Errorf("expected empty fallback, got %s", r.Fallback)
+	}
+}
+
+func TestParseStaticWithFallback(t *testing.T) {
+	cfg := `
+spa.example.com {
+    root /var/www/spa
+    file_server {path} /index.html
+}
+`
+	path := writeTemp(t, cfg)
+	defer os.Remove(path)
+
+	c, err := Parse(path)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	r := c.Routes[0]
+	if r.Type != RouteStatic {
+		t.Errorf("expected static type")
+	}
+	if r.Fallback != "/index.html" {
+		t.Errorf("expected fallback /index.html, got %s", r.Fallback)
+	}
 }
 
 func TestParsePortBlock(t *testing.T) {

@@ -17,10 +17,11 @@ const (
 
 // Route represents a single parsed routing entry.
 type Route struct {
-	Host   string    // "api.example.com" or ":4000"
-	Type   RouteType // proxy | static
-	Target string    // upstream address for proxy
-	Root   string    // filesystem root for static
+	Host     string    // "api.example.com" or ":4000"
+	Type     RouteType // proxy | static
+	Target   string    // upstream address for proxy
+	Root     string    // filesystem root for static
+	Fallback string    // fallback file for static (e.g. index.html)
 }
 
 // Config holds all parsed routes.
@@ -44,9 +45,10 @@ func Parse(path string) (*Config, error) {
 		currentHost string
 		hasProxy   bool
 		hasStatic  bool
-		proxyTarget string
-		staticRoot  string
-		lineNum    int
+		proxyTarget    string
+		staticRoot     string
+		staticFallback string
+		lineNum        int
 	)
 
 	flushBlock := func() error {
@@ -66,6 +68,7 @@ func Parse(path string) (*Config, error) {
 		} else {
 			r.Type = RouteStatic
 			r.Root = staticRoot
+			r.Fallback = staticFallback
 		}
 		cfg.Routes = append(cfg.Routes, r)
 		return nil
@@ -78,6 +81,7 @@ func Parse(path string) (*Config, error) {
 		hasStatic = false
 		proxyTarget = ""
 		staticRoot = ""
+		staticFallback = ""
 	}
 
 	for scanner.Scan() {
@@ -135,6 +139,9 @@ func Parse(path string) (*Config, error) {
 
 		case "file_server":
 			hasStatic = true
+			if len(parts) >= 3 && parts[1] == "{path}" {
+				staticFallback = parts[2]
+			}
 
 		default:
 			return nil, fmt.Errorf("line %d: unknown directive %q", lineNum, directive)
