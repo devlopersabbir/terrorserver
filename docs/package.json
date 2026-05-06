@@ -1,4 +1,18 @@
 {
+  "name": "terror-server-docs",
+  "version": "1.0.1",
+  "description": "terror server documentation",
+  "author": "Sabbir Hossain Shuvo",
+  "license": "MIT",
+  "keywords": [
+    "terror",
+    "server",
+    "documentation"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devlopersabbir/terrorserver"
+  },
   "dependencies": {},
   "devDependencies": {
     "vitepress": "^2.0.0-alpha.17"
