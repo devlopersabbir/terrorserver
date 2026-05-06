@@ -18,6 +18,7 @@ CHANNEL="${TERROR_CHANNEL:-stable}"
 DOWNLOAD_BASE="https://github.com/$REPO/releases/latest/download"
 TEMPLATE_BASE="${TERROR_TEMPLATE_BASE:-https://terror.softvenceomega.com}"
 AUTHOR_NAME="Sabbir Hossain Shuvo"
+AUTHOR_EMAIL="sabbirshuvo@softvence.com"
 AUTHOR_URL="https://devlopersabbir.github.io"
 
 RED='\033[0;31m'
