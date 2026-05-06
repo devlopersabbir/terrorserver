@@ -63,12 +63,6 @@ func listenAddr() string {
 	return defaultAddr
 }
 
-func installURL() string {
-	if u := os.Getenv("TERROR_INSTALL_URL"); u != "" {
-		return u
-	}
-	return defaultInstallURL
-}
 
 func runServe() {
 	cfgPath := configPath()
@@ -136,28 +130,23 @@ func runValidate() {
 }
 
 func runUpdate() {
-	url := installURL()
-	fmt.Println()
-	fmt.Println("  terrorserver update")
-	fmt.Println("  -------------------------------------")
-	fmt.Printf("  pulling latest stable release from %s\n", url)
-	fmt.Println()
+	fmt.Println("\n  Updating terrorserver...")
+	fmt.Printf("  Pulling latest stable release from %s\n\n", defaultInstallURL)
 
-	args := []string{"-fsSL", url}
-	if os.Geteuid() == 0 {
-		if err := pipeCommand(exec.Command("curl", args...), exec.Command("bash")); err != nil {
-			fmt.Fprintf(os.Stderr, "update failed: %v\n", err)
+	curl := exec.Command("curl", "-fsSL", defaultInstallURL)
+	bash := exec.Command("bash")
+
+	// If not root, use sudo and preserve environment
+	if os.Geteuid() != 0 {
+		if _, err := exec.LookPath("sudo"); err != nil {
+			fmt.Fprintln(os.Stderr, "✘ update failed: sudo is required for update")
 			os.Exit(1)
 		}
-		return
+		bash = exec.Command("sudo", "-E", "bash")
 	}
 
-	if _, err := exec.LookPath("sudo"); err != nil {
-		fmt.Fprintln(os.Stderr, "update failed: run 'sudo terror update' or install sudo")
-		os.Exit(1)
-	}
-	if err := pipeCommand(exec.Command("curl", args...), exec.Command("sudo", "bash")); err != nil {
-		fmt.Fprintf(os.Stderr, "update failed: %v\n", err)
+	if err := pipeCommand(curl, bash); err != nil {
+		fmt.Fprintf(os.Stderr, "\n✘ update failed: %v\n", err)
 		os.Exit(1)
 	}
 }

@@ -1,5 +1,5 @@
 - [x] Domain pointing not working
 - [x] terror status should show the list of item that user put on Runtime config file for serve. And it should give proper message it's working now or what issue (in short message)
-- [ ] Domain should auto ssl enabled as like caddy does
+- [x] Domain should auto ssl enabled as like caddy does
   - Status now warns clearly that automatic SSL is not enabled yet.
   - Full Caddy-like SSL needs real ACME certificate management and a `:443` listener.
