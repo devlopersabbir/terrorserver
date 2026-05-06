@@ -14,8 +14,10 @@ caddy-dist
 
 # IDE files
 .idea/
-.vscode/
 
 docs/node_modules/
 docs/.vitepress/cache/
 docs/.vitepress/dist/
+temp_auto_push.bat
+temp_interactive_push.bat
+.gitignore
