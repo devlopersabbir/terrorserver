@@ -176,7 +176,7 @@ function copyBottomCommand() {
 
 <template>
   <div class="smooth-home">
-    <!-- Ambient Horizon Light -->
+    <!-- Soft Ambient Horizon Light -->
     <div class="glow-beam"></div>
     <div class="subtle-grid"></div>
 
@@ -340,11 +340,11 @@ function copyBottomCommand() {
                 <span>Zero Dependencies</span>
               </div>
               <div class="foot-item">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 <span>Let's Encrypt TLS</span>
               </div>
               <div class="foot-item">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
                 <span>systemd .path Watcher</span>
               </div>
             </div>
@@ -531,7 +531,7 @@ function copyBottomCommand() {
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
               </svg>
-              <svg v-else width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <svg v-else width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2.5">
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
               <span>{{ copiedPg ? 'Copied' : 'Copy Runtime' }}</span>
@@ -618,7 +618,7 @@ function copyBottomCommand() {
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
               </svg>
-              <svg v-else width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <svg v-else width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2.5">
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
               <span>{{ copiedBottomInstall ? 'Copied' : 'Copy' }}</span>
@@ -646,17 +646,17 @@ function copyBottomCommand() {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Ambient Horizon Glow */
+/* Soft Ambient Horizon Glow */
 .glow-beam {
   position: absolute;
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 960px;
+  width: 900px;
   max-width: 100vw;
-  height: 480px;
-  background: radial-gradient(ellipse 65% 45% at 50% 0%, var(--home-glow), transparent 80%);
-  filter: blur(40px);
+  height: 400px;
+  background: radial-gradient(ellipse 60% 40% at 50% 0%, var(--home-glow), transparent 75%);
+  filter: blur(50px);
   pointer-events: none;
   z-index: 0;
 }
@@ -678,7 +678,7 @@ function copyBottomCommand() {
   z-index: 1;
   max-width: 1152px;
   margin: 0 auto;
-  padding: 68px 24px 72px;
+  padding: 64px 24px 68px;
 }
 
 .hero-container {
@@ -721,7 +721,7 @@ function copyBottomCommand() {
   height: 6px;
   border-radius: 50%;
   background: #10b981;
-  box-shadow: 0 0 8px #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
 }
 
 .tag-version {
@@ -745,15 +745,22 @@ function copyBottomCommand() {
 }
 
 .hero-h1 {
-  font-size: clamp(38px, 4.8vw, 58px);
+  font-size: clamp(36px, 4.6vw, 54px);
   font-weight: 900;
-  line-height: 1.1;
+  line-height: 1.12;
   letter-spacing: -0.03em;
   color: var(--home-heading);
   margin-bottom: 18px;
 }
 
 .gradient-text {
+  background: linear-gradient(135deg, #0d9488 0%, #0284c7 60%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dark .gradient-text {
   background: linear-gradient(135deg, #14b8a6 0%, #38bdf8 60%, #a78bfa 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -761,7 +768,7 @@ function copyBottomCommand() {
 }
 
 .hero-subtext {
-  font-size: clamp(15.5px, 1.7vw, 17.5px);
+  font-size: clamp(15.5px, 1.7vw, 17px);
   line-height: 1.65;
   color: var(--home-text);
   margin-bottom: 26px;
@@ -794,14 +801,14 @@ function copyBottomCommand() {
   font-size: 14px;
   padding: 10px 20px;
   border-radius: 8px;
-  box-shadow: 0 4px 18px rgba(20, 184, 166, 0.35);
+  box-shadow: 0 4px 14px rgba(20, 184, 166, 0.25);
   text-decoration: none !important;
   transition: all 0.2s ease;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(20, 184, 166, 0.5);
+  box-shadow: 0 6px 20px rgba(20, 184, 166, 0.4);
 }
 
 .btn-secondary {
@@ -852,7 +859,7 @@ function copyBottomCommand() {
   padding: 8px 12px;
   width: 100%;
   max-width: 500px;
-  box-shadow: 0 10px 25px var(--home-shadow);
+  box-shadow: 0 4px 16px var(--home-shadow);
   backdrop-filter: blur(8px);
   transition: border-color 0.2s;
 }
@@ -923,7 +930,7 @@ function copyBottomCommand() {
   border: 1px solid var(--home-code-border);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 20px 50px -10px var(--home-shadow);
+  box-shadow: 0 16px 40px var(--home-shadow);
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
@@ -1071,7 +1078,7 @@ function copyBottomCommand() {
 .tok-ok {
   color: #10b981;
   font-weight: 700;
-  background: rgba(16, 185, 129, 0.15);
+  background: rgba(16, 185, 129, 0.12);
   padding: 0 4px;
   border-radius: 3px;
   font-size: 10px;
@@ -1111,7 +1118,7 @@ function copyBottomCommand() {
   z-index: 1;
   max-width: 1152px;
   margin: 0 auto;
-  padding: 0 24px 64px;
+  padding: 0 24px 60px;
 }
 
 .metrics-box {
@@ -1121,8 +1128,8 @@ function copyBottomCommand() {
   background: var(--home-card-bg);
   border: 1px solid var(--home-border);
   border-radius: 12px;
-  padding: 22px 28px;
-  box-shadow: 0 4px 20px var(--home-shadow);
+  padding: 20px 26px;
+  box-shadow: 0 4px 18px var(--home-shadow);
   backdrop-filter: blur(10px);
   flex-wrap: wrap;
   gap: 20px;
@@ -1148,7 +1155,7 @@ function copyBottomCommand() {
 }
 
 .metric-val {
-  font-size: 21px;
+  font-size: 20px;
   font-weight: 800;
   color: var(--vp-c-brand-1);
   margin-bottom: 2px;
@@ -1177,12 +1184,12 @@ function copyBottomCommand() {
   z-index: 1;
   max-width: 1152px;
   margin: 0 auto;
-  padding: 60px 24px;
+  padding: 56px 24px;
 }
 
 .section-header {
   text-align: center;
-  margin-bottom: 44px;
+  margin-bottom: 40px;
 }
 
 .section-badge {
@@ -1200,7 +1207,7 @@ function copyBottomCommand() {
 }
 
 .section-h2 {
-  font-size: clamp(26px, 3.5vw, 36px);
+  font-size: clamp(25px, 3.4vw, 34px);
   font-weight: 800;
   color: var(--home-heading);
   margin-bottom: 8px;
@@ -1208,16 +1215,16 @@ function copyBottomCommand() {
 }
 
 .section-p {
-  font-size: 15.5px;
+  font-size: 15px;
   color: var(--home-text);
-  max-width: 580px;
+  max-width: 560px;
   margin: 0 auto;
 }
 
 .bento-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
+  gap: 20px;
 }
 
 .bento-card {
@@ -1225,8 +1232,8 @@ function copyBottomCommand() {
   background: var(--home-card-bg);
   border: 1px solid var(--home-border);
   border-radius: 12px;
-  padding: 24px 20px;
-  box-shadow: 0 4px 20px var(--home-shadow);
+  padding: 22px 20px;
+  box-shadow: 0 4px 16px var(--home-shadow);
   backdrop-filter: blur(10px);
   transition: all 0.25s ease;
   overflow: hidden;
@@ -1235,7 +1242,7 @@ function copyBottomCommand() {
 .bento-card:hover {
   border-color: var(--home-border-hover);
   transform: translateY(-2px);
-  box-shadow: 0 14px 32px var(--home-shadow);
+  box-shadow: 0 10px 24px var(--home-shadow);
 }
 
 .card-glow-bg {
@@ -1243,7 +1250,7 @@ function copyBottomCommand() {
   top: 0;
   left: 0;
   right: 0;
-  height: 90px;
+  height: 80px;
   background: radial-gradient(circle at 50% 0%, var(--home-glow), transparent 70%);
   opacity: 0;
   transition: opacity 0.3s;
@@ -1284,7 +1291,7 @@ function copyBottomCommand() {
 }
 
 .bento-title {
-  font-size: 16px;
+  font-size: 15.5px;
   font-weight: 700;
   color: var(--home-heading);
   margin-bottom: 6px;
@@ -1294,7 +1301,7 @@ function copyBottomCommand() {
   font-size: 13px;
   color: var(--home-text);
   line-height: 1.55;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .bento-code {
@@ -1327,7 +1334,7 @@ function copyBottomCommand() {
   border: 1px solid var(--home-border);
   border-radius: 14px;
   padding: 24px;
-  box-shadow: 0 16px 40px var(--home-shadow);
+  box-shadow: 0 12px 32px var(--home-shadow);
 }
 
 .pg-controls {
@@ -1471,7 +1478,7 @@ function copyBottomCommand() {
   border: 1px solid var(--home-border);
   border-radius: 12px;
   overflow-x: auto;
-  box-shadow: 0 14px 36px var(--home-shadow);
+  box-shadow: 0 10px 28px var(--home-shadow);
 }
 
 .table-grid {
@@ -1530,7 +1537,7 @@ function copyBottomCommand() {
   z-index: 1;
   max-width: 1152px;
   margin: 0 auto;
-  padding: 30px 24px 90px;
+  padding: 24px 24px 80px;
 }
 
 .cta-box {
@@ -1538,9 +1545,9 @@ function copyBottomCommand() {
   background: radial-gradient(circle at 50% 0%, var(--home-glow), var(--home-card-bg) 75%);
   border: 1px solid var(--home-border-hover);
   border-radius: 16px;
-  padding: 52px 24px;
+  padding: 48px 24px;
   text-align: center;
-  box-shadow: 0 20px 50px var(--home-shadow);
+  box-shadow: 0 16px 40px var(--home-shadow);
   backdrop-filter: blur(10px);
 }
 
@@ -1559,7 +1566,7 @@ function copyBottomCommand() {
 }
 
 .cta-h2 {
-  font-size: clamp(26px, 3.8vw, 36px);
+  font-size: clamp(25px, 3.4vw, 34px);
   font-weight: 800;
   color: var(--home-heading);
   margin-bottom: 8px;
@@ -1567,16 +1574,16 @@ function copyBottomCommand() {
 }
 
 .cta-p {
-  font-size: 15.5px;
+  font-size: 15px;
   color: var(--home-text);
-  max-width: 520px;
-  margin: 0 auto 28px;
+  max-width: 500px;
+  margin: 0 auto 26px;
 }
 
 .cta-install-widget {
   width: 100%;
   max-width: 600px;
-  margin: 0 auto 28px;
+  margin: 0 auto 26px;
   background: var(--home-code-viewport-bg);
   border: 1px solid var(--home-code-border);
   border-radius: 9px;

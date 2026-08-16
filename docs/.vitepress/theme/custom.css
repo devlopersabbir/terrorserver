@@ -4,7 +4,7 @@
   --vp-c-brand-1: #0f766e;
   --vp-c-brand-2: #0d9488;
   --vp-c-brand-3: #14b8a6;
-  --vp-c-brand-soft: rgba(20, 184, 166, 0.12);
+  --vp-c-brand-soft: rgba(20, 184, 166, 0.1);
 
   --home-bg: #ffffff;
   --home-card-bg: #ffffff;
@@ -14,7 +14,7 @@
   --home-code-window-bg: #f8fafc;
   --home-code-window-bar: #f1f5f9;
   --home-code-viewport-bg: #ffffff;
-  --home-code-border: rgba(0, 0, 0, 0.1);
+  --home-code-border: rgba(0, 0, 0, 0.08);
   --home-code-text: #1e293b;
   --home-code-comment: #64748b;
   --home-code-domain: #0284c7;
@@ -26,14 +26,14 @@
   --home-code-tab-active-text: #0f766e;
   --home-code-tab-inactive-text: #64748b;
 
-  --home-border: rgba(0, 0, 0, 0.08);
-  --home-border-hover: rgba(20, 184, 166, 0.5);
+  --home-border: rgba(0, 0, 0, 0.07);
+  --home-border-hover: rgba(20, 184, 166, 0.4);
   --home-heading: #0f172a;
   --home-text: #475569;
   --home-muted: #64748b;
-  --home-glow: rgba(20, 184, 166, 0.08);
-  --home-grid: rgba(0, 0, 0, 0.035);
-  --home-shadow: rgba(0, 0, 0, 0.06);
+  --home-glow: rgba(20, 184, 166, 0.06);
+  --home-grid: rgba(0, 0, 0, 0.03);
+  --home-shadow: rgba(0, 0, 0, 0.05);
 
   --vp-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --vp-font-family-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -43,36 +43,37 @@
   --vp-c-brand-1: #14b8a6;
   --vp-c-brand-2: #0d9488;
   --vp-c-brand-3: #2dd4bf;
-  --vp-c-brand-soft: rgba(20, 184, 166, 0.16);
+  --vp-c-brand-soft: rgba(20, 184, 166, 0.12);
 
-  --home-bg: #07090e;
-  --home-card-bg: rgba(12, 16, 26, 0.7);
-  --home-card-bg-alt: #0b0f19;
+  /* Soft, eye-comfort dark slate palette */
+  --home-bg: #0b0f19;
+  --home-card-bg: rgba(17, 24, 39, 0.6);
+  --home-card-bg-alt: #111827;
 
   /* Code block tokens for Dark Mode */
-  --home-code-window-bg: #080c14;
-  --home-code-window-bar: #0c111c;
-  --home-code-viewport-bg: #05080e;
-  --home-code-border: rgba(20, 184, 166, 0.3);
-  --home-code-text: #f1f5f9;
+  --home-code-window-bg: #0e1424;
+  --home-code-window-bar: #131b2e;
+  --home-code-viewport-bg: #090e1a;
+  --home-code-border: rgba(255, 255, 255, 0.08);
+  --home-code-text: #e2e8f0;
   --home-code-comment: #64748b;
   --home-code-domain: #38bdf8;
   --home-code-keyword: #2dd4bf;
-  --home-code-val: #facc15;
-  --home-code-linenum: #334155;
+  --home-code-val: #fbbf24;
+  --home-code-linenum: #475569;
   --home-code-prompt: #14b8a6;
-  --home-code-tab-active-bg: rgba(20, 184, 166, 0.18);
+  --home-code-tab-active-bg: rgba(20, 184, 166, 0.14);
   --home-code-tab-active-text: #2dd4bf;
-  --home-code-tab-inactive-text: #94a3b8;
+  --home-code-tab-inactive-text: #8899ac;
 
-  --home-border: rgba(255, 255, 255, 0.08);
-  --home-border-hover: rgba(20, 184, 166, 0.45);
-  --home-heading: #ffffff;
+  --home-border: rgba(255, 255, 255, 0.07);
+  --home-border-hover: rgba(20, 184, 166, 0.35);
+  --home-heading: #f1f5f9;
   --home-text: #94a3b8;
   --home-muted: #64748b;
-  --home-glow: rgba(20, 184, 166, 0.22);
-  --home-grid: rgba(255, 255, 255, 0.025);
-  --home-shadow: rgba(0, 0, 0, 0.5);
+  --home-glow: rgba(20, 184, 166, 0.09);
+  --home-grid: rgba(255, 255, 255, 0.02);
+  --home-shadow: rgba(0, 0, 0, 0.35);
 }
 
 /* Base resets & smooth scrolling */
@@ -89,8 +90,8 @@ body {
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
@@ -128,7 +129,7 @@ body {
 
 /* Documentation Content & Markdown Styling */
 .vp-doc h1 {
-  font-size: 34px !important;
+  font-size: 32px !important;
   font-weight: 800 !important;
   letter-spacing: -0.02em !important;
   margin-bottom: 24px !important;
@@ -137,12 +138,12 @@ body {
 .vp-doc h2 {
   border-top: 1px solid var(--vp-c-divider) !important;
   padding-top: 32px !important;
-  font-size: 24px !important;
+  font-size: 23px !important;
   font-weight: 700 !important;
 }
 
 .vp-doc h3 {
-  font-size: 18px !important;
+  font-size: 17.5px !important;
   font-weight: 600 !important;
 }
 
