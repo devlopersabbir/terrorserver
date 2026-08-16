@@ -24,7 +24,7 @@ It is designed for simple Linux servers where you want Caddy-like ergonomics wit
 Install the latest stable release:
 
 ```bash
-curl -fsSL https://terror.softvenceomega.com/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/devlopersabbir/terrorserver/main/scripts/install.sh | sudo bash
 ```
 
 Check the service:
@@ -231,7 +231,7 @@ terror update
 This runs the hosted installer again:
 
 ```bash
-https://terror.softvenceomega.com/install.sh
+curl -fsSL https://raw.githubusercontent.com/devlopersabbir/terrorserver/main/scripts/install.sh | sudo bash
 ```
 
 The installer downloads the latest GitHub release asset, replaces `/usr/local/bin/terror`, refreshes the systemd service files, and keeps existing Runtime config and welcome files when they already exist.
@@ -241,32 +241,32 @@ The installer downloads the latest GitHub release asset, replaces `/usr/local/bi
 Interactive uninstall:
 
 ```bash
-curl -fsSL https://terror.softvenceomega.com/uninstall.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/devlopersabbir/terrorserver/main/scripts/uninstall.sh | sudo bash
 ```
 
 Non-interactive uninstall:
 
 ```bash
-curl -fsSL https://terror.softvenceomega.com/uninstall.sh | sudo bash -s -- --yes
+curl -fsSL https://raw.githubusercontent.com/devlopersabbir/terrorserver/main/scripts/uninstall.sh | sudo bash -s -- --yes
 ```
 
 The uninstaller stops and disables the systemd service, removes the binary and watcher units, then asks before deleting config, welcome site, and certificate cache directories.
 
 ## Environment Variables
 
-| Variable               | Default                                        | Used by                | Description                                           |
-| ---------------------- | ---------------------------------------------- | ---------------------- | ----------------------------------------------------- |
-| `TERROR_CONFIG`        | `/etc/terror/Runtime`                          | Binary, service        | Runtime config path                                   |
-| `TERROR_ADDR`          | `:80`                                          | Binary, installer      | Default listen address                                |
-| `TERROR_CERT_CACHE`    | `/var/lib/terror/certs`                        | Binary, installer      | Let's Encrypt certificate cache                       |
-| `TERROR_AUTO_TLS`      | enabled                                        | Binary                 | Set to `false`, `0`, or `no` to disable automatic TLS |
-| `TERROR_HTTPS_REDIRECT` | disabled                                      | Binary                 | Set to `true`, `1`, or `yes` to redirect domain HTTP traffic to HTTPS |
-| `TERROR_INSTALL_URL`   | `https://terror.softvenceomega.com/install.sh` | `terror update`        | Installer URL used by update command                  |
-| `TERROR_WEB_ROOT`      | `/var/www/terrorserver`                        | Installer, uninstaller | Default welcome page root                             |
-| `TERROR_TEMPLATE_BASE` | `https://terror.softvenceomega.com`            | Installer              | Host for `Runtime` and `welcome.html` templates       |
-| `TERROR_REPO`          | `devlopersabbir/terrorserver`                  | Installer              | GitHub repository used for release downloads          |
-| `TERROR_ASSET`         | auto-detected                                  | Installer              | Release asset override                                |
-| `TERROR_CHANNEL`       | `stable`                                       | Installer              | Display channel label                                 |
+| Variable               | Default                                                                                           | Used by                | Description                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------- | ---------------------- | --------------------------------------------------------------------- |
+| `TERROR_CONFIG`        | `/etc/terror/Runtime`                                                                             | Binary, service        | Runtime config path                                                   |
+| `TERROR_ADDR`          | `:80`                                                                                             | Binary, installer      | Default listen address                                                |
+| `TERROR_CERT_CACHE`    | `/var/lib/terror/certs`                                                                           | Binary, installer      | Let's Encrypt certificate cache                                       |
+| `TERROR_AUTO_TLS`      | enabled                                                                                           | Binary                 | Set to `false`, `0`, or `no` to disable automatic TLS                 |
+| `TERROR_HTTPS_REDIRECT` | disabled                                                                                         | Binary                 | Set to `true`, `1`, or `yes` to redirect domain HTTP traffic to HTTPS |
+| `TERROR_INSTALL_URL`   | `https://raw.githubusercontent.com/devlopersabbir/terrorserver/main/scripts/install.sh`          | `terror update`        | Installer URL used by update command                                  |
+| `TERROR_WEB_ROOT`      | `/var/www/terrorserver`                                                                           | Installer, uninstaller | Default welcome page root                                             |
+| `TERROR_TEMPLATE_BASE` | `https://raw.githubusercontent.com/devlopersabbir/terrorserver/main/templates`                   | Installer              | Host for `Runtime` and `welcome.html` templates                       |
+| `TERROR_REPO`          | `devlopersabbir/terrorserver`                                                                     | Installer              | GitHub repository used for release downloads                          |
+| `TERROR_ASSET`         | auto-detected                                                                                     | Installer              | Release asset override                                                |
+| `TERROR_CHANNEL`       | `stable`                                                                                          | Installer              | Display channel label                                                 |
 
 ## Systemd Operation
 

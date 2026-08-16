@@ -11,7 +11,7 @@ Terror Server runs as a single Go binary and is usually installed as a systemd-m
 ## Install
 
 ```bash
-curl -fsSL https://terror.softvenceomega.com/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/devlopersabbir/terrorserver/main/scripts/install.sh | sudo bash
 ```
 
 Then check the service:
