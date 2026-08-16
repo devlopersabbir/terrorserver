@@ -5,17 +5,43 @@ The hosted installer downloads the latest stable Linux release, installs the bin
 ## Standard Install
 
 ```bash
-curl -fsSL https://terror.softvenceomega.com/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/devlopersabbir/terrorserver/main/scripts/install.sh | sudo bash
 ```
 
-The installer configures:
+It fetches the stable binary for your host architecture (`amd64` or `arm64`), creates default paths, drops systemd service and watcher units, and starts the daemon.
 
-- `/usr/local/bin/terror`
-- `/etc/terror/Runtime`
-- `/var/www/terrorserver`
-- `terror.service`
-- `terror.path`
-- `terror-restart.service`
+## Installation Flow
+
+1. Validates root execution (`sudo`).
+2. Checks for `curl` or `wget`.
+3. Detects OS and architecture (`linux-amd64` or `linux-arm64`).
+4. Downloads the release binary from GitHub Releases.
+5. Installs binary to `/usr/local/bin/terror`.
+6. Downloads `welcome.html` into `/var/www/terrorserver/index.html`.
+7. Creates certificate cache at `/var/lib/terror/certs`.
+8. Downloads `Runtime` config template into `/etc/terror/Runtime`.
+9. Writes systemd service `/etc/systemd/system/terror.service`.
+10. Writes systemd path watcher `/etc/systemd/system/terror.path` and restart unit `/etc/systemd/system/terror-restart.service`.
+11. Enables and starts the systemd service.
+
+## Installer Overrides
+
+You can control installer behavior using environment variables:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/devlopersabbir/terrorserver/main/scripts/install.sh | TERROR_ADDR=":9090" sudo -E bash
+```
+
+Supported overrides:
+
+| Variable | Purpose |
+| --- | --- |
+| `TERROR_ADDR` | Custom listen port during initial Runtime generation |
+| `TERROR_WEB_ROOT` | Custom default web root path |
+| `TERROR_CERT_CACHE` | Custom Let's Encrypt certificate directory |
+| `TERROR_REPO` | Target GitHub repository (`devlopersabbir/terrorserver`) |
+| `TERROR_ASSET` | Specific binary release asset name |
+| `TERROR_TEMPLATE_BASE` | `https://raw.githubusercontent.com/devlopersabbir/terrorserver/main/templates` |
 
 ## Verify The Install
 
@@ -27,18 +53,6 @@ sudo systemctl status terror.path
 ```
 
 The service should be active, and the path watcher should be enabled so Runtime edits restart the server.
-
-## Installer Inputs
-
-The installer is controlled by environment variables when you need a non-default release source or template host.
-
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `TERROR_REPO` | `devlopersabbir/terrorserver` | GitHub repository used for release downloads |
-| `TERROR_ASSET` | auto-detected | Release asset override |
-| `TERROR_CHANNEL` | `stable` | Display channel label |
-| `TERROR_TEMPLATE_BASE` | `https://terror.softvenceomega.com` | Host for `Runtime` and `welcome.html` templates |
-| `TERROR_WEB_ROOT` | `/var/www/terrorserver` | Default welcome page root |
 
 ## After Install
 

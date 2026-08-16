@@ -239,7 +239,7 @@ print_done() {
   echo -e ""
   echo -e "  ${WHITE}${BOLD}MAINTAINER${NC}"
   echo -e "  ${GRAY}By${NC} ${AUTHOR_NAME} ${GRAY}(${AUTHOR_URL})${NC}"
-  echo -e "  ${GRAY}Docs: https://terror.softvenceomega.com/docs${NC}"
+  echo -e "  ${GRAY}Docs: https://github.com/${REPO}#readme${NC}"
   echo -e ""
 }
 

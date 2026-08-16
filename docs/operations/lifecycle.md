@@ -18,24 +18,24 @@ terror upgrade
 
 The update command runs:
 
-```txt
-https://terror.softvenceomega.com/install.sh
+```bash
+curl -fsSL https://raw.githubusercontent.com/devlopersabbir/terrorserver/main/scripts/install.sh | sudo bash
 ```
 
-The installer downloads the latest GitHub release asset, replaces `/usr/local/bin/terror`, refreshes the systemd service files, and keeps existing Runtime config and welcome files when they already exist.
+The installer re-fetches the binary and service files, leaving existing config and root files intact if present.
 
-## Uninstall
+## Uninstalling
 
-Interactive uninstall:
+Interactive removal:
 
 ```bash
-curl -fsSL https://terror.softvenceomega.com/uninstall.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/devlopersabbir/terrorserver/main/scripts/uninstall.sh | sudo bash
 ```
 
-Non-interactive uninstall:
+Unattended removal:
 
 ```bash
-curl -fsSL https://terror.softvenceomega.com/uninstall.sh | sudo bash -s -- --yes
+curl -fsSL https://raw.githubusercontent.com/devlopersabbir/terrorserver/main/scripts/uninstall.sh | sudo bash -s -- --yes
 ```
 
 The uninstaller stops and disables the systemd service, removes the binary and watcher units, then asks before deleting config, welcome site, and certificate cache directories.

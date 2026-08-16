@@ -18,7 +18,7 @@ import (
 const (
 	defaultConfigPath = "/etc/terror/Runtime"
 	defaultAddr       = ":80"
-	defaultInstallURL = "https://terror.softvenceomega.com/install.sh"
+	defaultInstallURL = "https://raw.githubusercontent.com/devlopersabbir/terrorserver/main/scripts/install.sh"
 )
 
 var version = "prod"
