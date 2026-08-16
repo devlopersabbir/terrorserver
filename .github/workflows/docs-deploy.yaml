@@ -1,20 +1,15 @@
-name: Deploy VitePress site to Pages
+name: Build & Verify Documentation
 
 on:
   push:
     branches: [main]
     paths:
       - "docs/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "docs/**"
   workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
 
 jobs:
   build:
@@ -26,19 +21,16 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 20
           cache: npm
           cache-dependency-path: docs/package-lock.json
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
 
       - name: Install dependencies
         run: npm ci
@@ -46,26 +38,3 @@ jobs:
       - name: Build with VitePress
         run: npm run docs:build
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs/.vitepress/dist
-
-      - name: Deploy docs
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USER }}
-          password: ${{ secrets.PASSWORD }}
-          source: "docs/.vitepress/dist"
-          target: "/var/www/docs"
-          strip_components: 1
-      - name: Restart caddy server
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USER }}
-          password: ${{ secrets.PASSWORD }}
-          script: |
-            mv -f /var/www/docs/.vitepress/dist/* /var/www/terrorserver/docs 
-            sudo systemctl restart terror
