@@ -340,11 +340,11 @@ function copyBottomCommand() {
                 <span>Zero Dependencies</span>
               </div>
               <div class="foot-item">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 <span>Let's Encrypt TLS</span>
               </div>
               <div class="foot-item">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
                 <span>systemd .path Watcher</span>
               </div>
             </div>
@@ -531,7 +531,7 @@ function copyBottomCommand() {
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
               </svg>
-              <svg v-else width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2.5">
+              <svg v-else width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
               <span>{{ copiedPg ? 'Copied' : 'Copy Runtime' }}</span>
@@ -618,7 +618,7 @@ function copyBottomCommand() {
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
               </svg>
-              <svg v-else width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2.5">
+              <svg v-else width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
               <span>{{ copiedBottomInstall ? 'Copied' : 'Copy' }}</span>
@@ -909,7 +909,7 @@ function copyBottomCommand() {
   color: var(--vp-c-brand-1);
 }
 
-/* Right Window - Terminal remains crisp dark for developer aesthetics */
+/* Right Window */
 .hero-visual {
   width: 100%;
   display: flex;
@@ -919,11 +919,12 @@ function copyBottomCommand() {
 .window-box {
   width: 100%;
   max-width: 490px;
-  background: #080c14;
-  border: 1px solid rgba(20, 184, 166, 0.3);
+  background: var(--home-code-window-bg);
+  border: 1px solid var(--home-code-border);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 20px 50px -10px var(--home-shadow);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .window-header {
@@ -931,8 +932,8 @@ function copyBottomCommand() {
   align-items: center;
   justify-content: space-between;
   padding: 9px 12px;
-  background: #0c111c;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--home-code-window-bar);
+  border-bottom: 1px solid var(--home-border);
   gap: 8px;
 }
 
@@ -954,7 +955,8 @@ function copyBottomCommand() {
 .window-tabs {
   display: flex;
   gap: 3px;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--home-card-bg-alt);
+  border: 1px solid var(--home-border);
   padding: 2px;
   border-radius: 6px;
 }
@@ -962,7 +964,7 @@ function copyBottomCommand() {
 .win-tab-btn {
   background: transparent;
   border: none;
-  color: #94a3b8;
+  color: var(--home-code-tab-inactive-text);
   font-size: 11.5px;
   font-weight: 500;
   padding: 4px 8px;
@@ -972,12 +974,13 @@ function copyBottomCommand() {
 }
 
 .win-tab-btn:hover {
-  color: #f1f5f9;
+  color: var(--home-heading);
 }
 
 .win-tab-btn.active {
-  color: #2dd4bf;
-  background: rgba(20, 184, 166, 0.18);
+  color: var(--home-code-tab-active-text);
+  background: var(--home-code-tab-active-bg);
+  box-shadow: 0 1px 3px var(--home-shadow);
   font-weight: 600;
 }
 
@@ -985,9 +988,9 @@ function copyBottomCommand() {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  color: #cbd5e1;
+  background: var(--home-card-bg-alt);
+  border: 1px solid var(--home-border);
+  color: var(--home-text);
   padding: 3px 7px;
   border-radius: 4px;
   font-size: 11px;
@@ -996,13 +999,13 @@ function copyBottomCommand() {
 }
 
 .win-copy-btn:hover {
-  background: rgba(20, 184, 166, 0.2);
-  color: #ffffff;
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
 }
 
 .window-body {
   padding: 14px 18px;
-  background: #05080e;
+  background: var(--home-code-viewport-bg);
   min-height: 190px;
 }
 
@@ -1012,10 +1015,10 @@ function copyBottomCommand() {
   justify-content: space-between;
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
-  color: #64748b;
+  color: var(--home-muted);
   margin-bottom: 10px;
   padding-bottom: 6px;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+  border-bottom: 1px dashed var(--home-border);
 }
 
 .meta-file {
@@ -1048,7 +1051,7 @@ function copyBottomCommand() {
 
 .num {
   width: 18px;
-  color: #334155;
+  color: var(--home-code-linenum);
   font-size: 10.5px;
   user-select: none;
   text-align: right;
@@ -1058,13 +1061,13 @@ function copyBottomCommand() {
   flex: 1;
 }
 
-.tok-comment { color: #64748b; font-style: italic; }
-.tok-domain { color: #38bdf8; font-weight: 600; }
-.tok-brace { color: #f1f5f9; }
-.tok-keyword { color: #2dd4bf; font-weight: 600; }
-.tok-val { color: #facc15; }
-.tok-cmd { color: #2dd4bf; font-weight: 700; }
-.tok-dim { color: #475569; }
+.tok-comment { color: var(--home-code-comment); font-style: italic; }
+.tok-domain { color: var(--home-code-domain); font-weight: 600; }
+.tok-brace { color: var(--home-code-text); }
+.tok-keyword { color: var(--home-code-keyword); font-weight: 600; }
+.tok-val { color: var(--home-code-val); }
+.tok-cmd { color: var(--vp-c-brand-1); font-weight: 700; }
+.tok-dim { color: var(--home-muted); }
 .tok-ok {
   color: #10b981;
   font-weight: 700;
@@ -1073,18 +1076,18 @@ function copyBottomCommand() {
   border-radius: 3px;
   font-size: 10px;
 }
-.tok-label { color: #94a3b8; }
-.tok-ok-text { color: #38bdf8; }
+.tok-label { color: var(--home-muted); }
+.tok-ok-text { color: var(--home-code-domain); }
 
 .window-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 7px 14px;
-  background: #080d16;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--home-code-window-bar);
+  border-top: 1px solid var(--home-border);
   font-size: 10.5px;
-  color: #94a3b8;
+  color: var(--home-muted);
   flex-wrap: wrap;
   gap: 6px;
 }
@@ -1099,7 +1102,7 @@ function copyBottomCommand() {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: #14b8a6;
+  background: var(--vp-c-brand-1);
 }
 
 /* 2. METRICS */
@@ -1274,14 +1277,10 @@ function copyBottomCommand() {
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  color: #0284c7;
-  background: rgba(56, 189, 248, 0.12);
+  color: var(--home-code-domain);
+  background: var(--vp-c-brand-soft);
   padding: 2px 7px;
   border-radius: 8px;
-}
-
-.dark .bento-tag {
-  color: #38bdf8;
 }
 
 .bento-title {
@@ -1299,13 +1298,13 @@ function copyBottomCommand() {
 }
 
 .bento-code {
-  background: #05080e;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--home-code-viewport-bg);
+  border: 1px solid var(--home-code-border);
   border-radius: 7px;
   padding: 9px 11px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
-  color: #38bdf8;
+  color: var(--home-code-domain);
   line-height: 1.45;
 }
 
@@ -1409,8 +1408,8 @@ function copyBottomCommand() {
 .pg-preview {
   display: flex;
   flex-direction: column;
-  background: #05080e;
-  border: 1px solid var(--home-border);
+  background: var(--home-code-viewport-bg);
+  border: 1px solid var(--home-code-border);
   border-radius: 9px;
   overflow: hidden;
 }
@@ -1420,8 +1419,8 @@ function copyBottomCommand() {
   align-items: center;
   justify-content: space-between;
   padding: 9px 12px;
-  background: #0a0f18;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--home-code-window-bar);
+  border-bottom: 1px solid var(--home-border);
 }
 
 .preview-filename {
@@ -1430,16 +1429,16 @@ function copyBottomCommand() {
   gap: 5px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--home-muted);
 }
 
 .preview-copy-btn {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: rgba(20, 184, 166, 0.15);
-  border: 1px solid rgba(20, 184, 166, 0.3);
-  color: #2dd4bf;
+  background: var(--home-card-bg-alt);
+  border: 1px solid var(--home-border);
+  color: var(--vp-c-brand-1);
   padding: 3px 7px;
   border-radius: 4px;
   font-size: 10.5px;
@@ -1462,7 +1461,7 @@ function copyBottomCommand() {
   font-family: 'JetBrains Mono', monospace;
   font-size: 12.5px;
   line-height: 1.6;
-  color: #38bdf8;
+  color: var(--home-code-domain);
   white-space: pre-wrap;
 }
 
@@ -1578,16 +1577,16 @@ function copyBottomCommand() {
   width: 100%;
   max-width: 600px;
   margin: 0 auto 28px;
-  background: #05080e;
-  border: 1px solid var(--home-border);
+  background: var(--home-code-viewport-bg);
+  border: 1px solid var(--home-code-border);
   border-radius: 9px;
   overflow: hidden;
 }
 
 .widget-tabs {
   display: flex;
-  background: #090e18;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--home-code-window-bar);
+  border-bottom: 1px solid var(--home-border);
   padding: 3px;
   gap: 3px;
 }
@@ -1595,7 +1594,7 @@ function copyBottomCommand() {
 .w-tab {
   background: transparent;
   border: none;
-  color: #94a3b8;
+  color: var(--home-code-tab-inactive-text);
   font-size: 11px;
   font-weight: 600;
   padding: 4px 10px;
@@ -1605,8 +1604,9 @@ function copyBottomCommand() {
 }
 
 .w-tab.active {
-  background: rgba(20, 184, 166, 0.15);
-  color: #2dd4bf;
+  background: var(--home-code-tab-active-bg);
+  color: var(--home-code-tab-active-text);
+  box-shadow: 0 1px 3px var(--home-shadow);
 }
 
 .widget-code-row {
@@ -1617,7 +1617,7 @@ function copyBottomCommand() {
 }
 
 .w-prompt {
-  color: #14b8a6;
+  color: var(--vp-c-brand-1);
   font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
   font-size: 12.5px;
@@ -1627,7 +1627,7 @@ function copyBottomCommand() {
   flex: 1;
   font-family: 'JetBrains Mono', monospace;
   font-size: 11.5px;
-  color: #f1f5f9;
+  color: var(--home-heading);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1638,9 +1638,9 @@ function copyBottomCommand() {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #cbd5e1;
+  background: var(--home-card-bg-alt);
+  border: 1px solid var(--home-border);
+  color: var(--home-text);
   padding: 3px 7px;
   border-radius: 4px;
   font-size: 10.5px;
@@ -1649,8 +1649,8 @@ function copyBottomCommand() {
 }
 
 .w-copy-btn:hover {
-  background: rgba(20, 184, 166, 0.2);
-  color: #ffffff;
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
 }
 
 .cta-buttons {
