@@ -1,0 +1,15 @@
+services:
+  terror:
+    image: ghcr.io/devlopersabbir/terrorserver:v1.0.0-stable
+    container_name: terror
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Runtime:/etc/terror/Runtime:ro
+      - terror_certs:/var/lib/terror/certs
+      - ./html:/var/www/html:ro
+
+volumes:
+  terror_certs:
