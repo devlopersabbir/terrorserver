@@ -41,6 +41,39 @@ sudo vim /etc/terror/Runtime
 
 The installer enables a systemd path watcher, so saving `/etc/terror/Runtime` restarts `terror.service` automatically. This allows new domains, removed routes, new listener ports, and TLS listeners to be picked up without manual `systemctl restart`.
 
+### Run with Docker
+
+You can also run Terror Server as a container using Docker:
+
+```bash
+docker run -d \
+  --name terror \
+  -p 80:80 \
+  -p 443:443 \
+  -v $(pwd)/Runtime:/etc/terror/Runtime \
+  -v terror_certs:/var/lib/terror/certs \
+  ghcr.io/devlopersabbir/terrorserver:v1.0.0-stable
+```
+
+Or using Docker Compose:
+
+```yaml
+services:
+  terror:
+    image: ghcr.io/devlopersabbir/terrorserver:v1.0.0-stable
+    container_name: terror
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Runtime:/etc/terror/Runtime:ro
+      - terror_certs:/var/lib/terror/certs
+
+volumes:
+  terror_certs:
+```
+
 ## Default Paths
 
 | Path                                         | Purpose                                   |
