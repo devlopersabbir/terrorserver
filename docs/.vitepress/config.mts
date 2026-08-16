@@ -6,7 +6,7 @@ export default defineConfig({
     "Developer documentation for Terror Server, a compact HTTP router, reverse proxy, static file server, and automatic TLS gateway.",
   cleanUrls: true,
   lastUpdated: true,
-  base: "/docs/",
+  base: "/",
   themeConfig: {
     logo: "/logo.svg",
     siteTitle: "Terror Server",
