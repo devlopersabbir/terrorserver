@@ -1,334 +1,161 @@
 /* docs/.vitepress/theme/custom.css */
+
 :root {
   --vp-c-brand-1: #0f766e;
   --vp-c-brand-2: #0d9488;
   --vp-c-brand-3: #14b8a6;
+  --vp-c-brand-soft: rgba(20, 184, 166, 0.12);
+
+  --home-bg: #ffffff;
+  --home-card-bg: #ffffff;
+  --home-card-bg-alt: #f8fafc;
+  --home-code-bg: #090d16;
+  --home-code-text: #f1f5f9;
+  --home-border: rgba(0, 0, 0, 0.08);
+  --home-border-hover: rgba(20, 184, 166, 0.5);
+  --home-heading: #0f172a;
+  --home-text: #475569;
+  --home-muted: #64748b;
+  --home-glow: rgba(20, 184, 166, 0.12);
+  --home-grid: rgba(0, 0, 0, 0.035);
+  --home-shadow: rgba(0, 0, 0, 0.06);
+
+  --vp-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --vp-font-family-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* Awesome Background for Home Page */
+.dark {
+  --vp-c-brand-1: #14b8a6;
+  --vp-c-brand-2: #0d9488;
+  --vp-c-brand-3: #2dd4bf;
+  --vp-c-brand-soft: rgba(20, 184, 166, 0.16);
+
+  --home-bg: #07090e;
+  --home-card-bg: rgba(12, 16, 26, 0.7);
+  --home-card-bg-alt: #0b0f19;
+  --home-code-bg: #05080e;
+  --home-code-text: #f1f5f9;
+  --home-border: rgba(255, 255, 255, 0.08);
+  --home-border-hover: rgba(20, 184, 166, 0.45);
+  --home-heading: #ffffff;
+  --home-text: #94a3b8;
+  --home-muted: #64748b;
+  --home-glow: rgba(20, 184, 166, 0.22);
+  --home-grid: rgba(255, 255, 255, 0.025);
+  --home-shadow: rgba(0, 0, 0, 0.5);
+}
+
+/* Base resets & smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--vp-font-family-base);
+  background-color: var(--home-bg);
+  color: var(--home-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--home-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--home-muted);
+  border-radius: 4px;
+}
+
+/* Navbar Enhancements */
+.VPNav {
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--home-border) !important;
+}
+
+.VPNavBarMenuLink.active,
+.VPNavBarMenuLink:hover {
+  color: var(--vp-c-brand-1) !important;
+}
+
+/* VPHome Clean Base */
 .VPHome {
   position: relative;
   overflow-x: hidden;
+  background-color: var(--home-bg);
+  min-height: 100vh;
 }
 
-.VPHome::before,
-.VPHome::after {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(120px);
-  z-index: 0;
-  pointer-events: none;
+/* Hide default empty features container */
+.VPFeatures:empty {
+  display: none !important;
 }
 
-.VPHome::before {
-  top: 0;
-  left: 0;
-  width: 50vw;
-  height: 50vw;
-  background: radial-gradient(circle, var(--vp-c-brand-1) 0%, transparent 70%);
-  opacity: 0.15;
+/* Documentation Content & Markdown Styling */
+.vp-doc h1 {
+  font-size: 34px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  margin-bottom: 24px !important;
 }
 
-.VPHome::after {
-  bottom: 0;
-  right: 0;
-  width: 40vw;
-  height: 40vw;
-  background: radial-gradient(circle, var(--vp-c-brand-3) 0%, transparent 70%);
-  opacity: 0.15;
+.vp-doc h2 {
+  border-top: 1px solid var(--vp-c-divider) !important;
+  padding-top: 32px !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
 }
 
-.dark .VPHome::before,
-.dark .VPHome::after {
-  opacity: 0.1;
+.vp-doc h3 {
+  font-size: 18px !important;
+  font-weight: 600 !important;
 }
 
-/* Bring content above the background */
-.VPHome .VPHero,
-.VPHome .VPFeatures,
-.VPHomeContent {
-  position: relative;
-  z-index: 1;
+.vp-doc p, .vp-doc li {
+  line-height: 1.7 !important;
 }
 
-/* Unique Runtime Showcase */
-.runtime-wrapper {
-  max-width: 680px;
-  margin: 64px auto;
-  padding: 0 24px;
-  position: relative;
-  z-index: 2;
-}
-
-.runtime-title {
-  text-align: center;
-  font-size: 32px;
-  font-weight: 800;
-  margin-bottom: 12px;
-  background: -webkit-linear-gradient(45deg, var(--vp-c-brand-1), var(--vp-c-brand-3));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.runtime-desc {
-  text-align: center;
-  color: var(--vp-c-text-2);
-  margin-bottom: 36px;
-  font-size: 18px;
-}
-
-.runtime-showcase {
-  background-color: var(--vp-c-bg-soft);
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 12px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.05);
-  overflow: hidden;
-  backdrop-filter: blur(20px);
-}
-
-.dark .runtime-showcase {
-  background-color: rgba(30, 30, 34, 0.7);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-}
-
-.showcase-header {
-  display: flex;
-  align-items: center;
-  padding: 16px 20px;
-  background-color: rgba(0,0,0,0.03);
-  border-bottom: 1px solid var(--vp-c-divider);
-}
-
-.dark .showcase-header {
-  background-color: rgba(255,255,255,0.02);
-}
-
-.mac-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.mac-buttons span {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-
-.mac-buttons .close { background-color: #ff5f56; }
-.mac-buttons .min { background-color: #ffbd2e; }
-.mac-buttons .max { background-color: #27c93f; }
-
-.showcase-header .title {
-  margin-left: auto;
-  margin-right: auto;
-  padding-right: 48px; /* Offset the mac buttons to truly center */
-  font-size: 13px;
-  font-family: var(--vp-font-family-mono);
-  color: var(--vp-c-text-2);
-}
-
-.showcase-body {
-  padding: 16px 24px;
-}
-
-/* Override Vitepress pre background */
-.showcase-body div[class*="language-"] {
-  margin: 0 !important;
-  background-color: transparent !important;
-}
-
-.showcase-body pre {
-  margin: 0 !important;
-  padding: 0 !important;
-  background-color: transparent !important;
-}
-
-/* Bottom CTA Section */
-.bottom-cta {
-  position: relative;
-  margin-top: 100px;
-  padding: 100px 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  border-top: 1px solid var(--vp-c-divider);
-  
-  /* Make full width to fill screen edge to edge */
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
-  width: 100vw;
-  max-width: 100vw;
-  
-  /* Awesome Background with Pattern */
-  background-color: var(--vp-c-bg-alt);
-  background-image: 
-    radial-gradient(ellipse at 50% 0%, rgba(20, 184, 166, 0.1) 0%, transparent 70%),
-    url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20z' fill='%2314b8a6' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
-}
-
-.dark .bottom-cta {
-  background-color: #0b0f14;
-  border-top: 1px solid rgba(255,255,255,0.05);
-}
-
-.cta-content {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  max-width: 700px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-.cta-badge {
-  display: inline-block;
-  padding: 6px 16px;
-  border-radius: 20px;
-  background-color: rgba(20, 184, 166, 0.1);
-  color: var(--vp-c-brand-1);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  margin-bottom: 24px;
-  border: 1px solid var(--vp-c-brand-1);
-}
-
-.cta-title {
-  font-size: clamp(32px, 5vw, 48px);
-  font-weight: 800;
-  line-height: 1.2;
-  margin-bottom: 16px;
-  color: var(--vp-c-text-1);
-}
-
-.cta-desc {
-  font-size: 18px;
-  color: var(--vp-c-text-2);
-  margin-bottom: 40px;
-  max-width: 500px;
-}
-
-.install-block {
-  display: flex;
-  align-items: center;
-  background-color: var(--vp-c-bg);
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 12px;
-  padding: 16px 24px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  width: 100%;
-  max-width: 600px;
-  margin-bottom: 40px;
-  transition: border-color 0.3s;
-}
-
-.dark .install-block {
-  background-color: #161b22;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-.install-block:hover {
-  border-color: var(--vp-c-brand-1);
-}
-
-.install-icon {
-  color: var(--vp-c-brand-1);
-  margin-right: 16px;
-  display: flex;
-}
-
-.install-block code {
-  font-family: var(--vp-font-family-mono);
-  font-size: 14px;
-  color: var(--vp-c-text-1);
-  background: transparent !important;
-  padding: 0 !important;
-  overflow-x: auto;
-  white-space: nowrap;
-}
-
-.cta-links {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  justify-content: center;
-  width: 100%;
-}
-
-.cta-link {
-  display: inline-flex;
-  justify-content: center;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 15px;
-  transition: all 0.2s;
+.vp-doc a {
+  color: var(--vp-c-brand-1) !important;
   text-decoration: none !important;
-  min-width: 160px;
+  font-weight: 500 !important;
 }
 
-.cta-link.primary {
-  background-color: var(--vp-c-brand-1);
-  color: white;
+.vp-doc a:hover {
+  text-decoration: underline !important;
 }
 
-.cta-link.primary:hover {
-  background-color: var(--vp-c-brand-2);
+.vp-doc code:not(pre code) {
+  background: var(--vp-c-brand-soft) !important;
+  color: var(--vp-c-brand-1) !important;
+  border: 1px solid var(--vp-c-brand-soft) !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  font-size: 0.9em !important;
 }
 
-.cta-link.secondary {
-  background-color: var(--vp-c-bg-soft);
-  color: var(--vp-c-text-1);
-  border: 1px solid var(--vp-c-divider);
+.vp-doc table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin: 24px 0 !important;
+  border: 1px solid var(--vp-c-divider) !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
 }
 
-.cta-link.secondary:hover {
-  border-color: var(--vp-c-brand-1);
-  color: var(--vp-c-brand-1);
+.vp-doc th {
+  background: var(--vp-c-bg-alt) !important;
+  padding: 12px 16px !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid var(--vp-c-divider) !important;
 }
 
-.cta-bg-glow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 800px;
-  height: 400px;
-  background: radial-gradient(ellipse at center, var(--vp-c-brand-1) 0%, transparent 60%);
-  opacity: 0.1;
-  filter: blur(80px);
-  z-index: 1;
-  pointer-events: none;
-}
-.dark .cta-bg-glow {
-  opacity: 0.15;
-}
-
-/* Responsiveness */
-@media (max-width: 640px) {
-  .bottom-cta {
-    padding: 60px 20px;
-    margin-top: 60px;
-  }
-  .cta-title {
-    font-size: 28px;
-  }
-  .install-block {
-    flex-direction: column;
-    text-align: center;
-    padding: 20px;
-    gap: 12px;
-  }
-  .install-icon {
-    margin-right: 0;
-  }
-  .cta-link {
-    width: 100%;
-  }
+.vp-doc td {
+  padding: 12px 16px !important;
+  border-bottom: 1px solid var(--vp-c-divider) !important;
 }

@@ -87,5 +87,8 @@ export default defineConfig({
   head: [
     ["meta", { name: "theme-color", content: "#0f766e" }],
     ["link", { rel: "icon", href: "/logo.svg" }],
+    ["link", { rel: "preconnect", href: "https://fonts.googleapis.com" }],
+    ["link", { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" }],
+    ["link", { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" }],
   ],
 });
